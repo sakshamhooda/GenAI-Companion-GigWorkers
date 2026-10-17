@@ -1,12 +1,8 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 
-/** Surface for grouped content. */
+/** Surface for grouped content. Colours come from the theme tokens in globals.css. */
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <section className={`rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 ${className}`}>
-      {children}
-    </section>
-  );
+  return <section className={`rounded-2xl border border-border bg-card p-4 shadow-sm ${className}`}>{children}</section>;
 }
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" };
@@ -14,21 +10,21 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primar
 /** 44px-tall button; `variant` picks primary or secondary styling. */
 export function Button({ variant = "primary", className = "", ...props }: ButtonProps) {
   const base =
-    "min-h-11 rounded-xl px-4 text-base font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 disabled:opacity-50";
+    "min-h-11 rounded-xl px-4 text-base font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50";
   const styles =
     variant === "primary"
-      ? "bg-emerald-700 text-white hover:bg-emerald-800"
-      : "border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100";
+      ? "bg-accent text-accent-fg hover:opacity-90"
+      : "border border-border bg-card text-fg hover:bg-bg";
   return <button className={`${base} ${styles} ${className}`} {...props} />;
 }
 
 const fieldClass =
-  "min-h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-base text-zinc-900 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-200 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100";
+  "min-h-11 w-full rounded-xl border border-border bg-card px-3 text-base text-fg focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/40";
 
 /** Visible form label; always pair with an input `id`. */
 export function Label({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
   return (
-    <label htmlFor={htmlFor} className="mb-1 block text-sm font-medium text-zinc-800 dark:text-zinc-200">
+    <label htmlFor={htmlFor} className="mb-1 block text-sm font-medium text-fg">
       {children}
     </label>
   );
@@ -56,6 +52,17 @@ export function ErrorText({ children }: { children: ReactNode }) {
   );
 }
 
+/** Small rounded label for statuses (urgency, connector kind, effort). */
+export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: "neutral" | "good" | "warn" | "bad" }) {
+  const tones = {
+    neutral: "bg-bg text-fg border-border",
+    good: "bg-emerald-100 text-emerald-900 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800",
+    warn: "bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800",
+    bad: "bg-red-100 text-red-900 border-red-300 dark:bg-red-950 dark:text-red-200 dark:border-red-800",
+  };
+  return <span className={`inline-block rounded-full border px-2.5 py-0.5 text-xs font-semibold ${tones[tone]}`}>{children}</span>;
+}
+
 type ChipGroupProps = {
   label: string;
   options: { value: string; label: string }[];
@@ -74,7 +81,7 @@ export function ChipGroup({ label, options, value, onChange, addLabel, addPlaceh
   const all = [...options, ...custom.map((v) => ({ value: v, label: v }))];
   return (
     <fieldset>
-      <legend className="mb-2 block text-sm font-medium text-zinc-800 dark:text-zinc-200">{label}</legend>
+      <legend className="mb-2 block text-sm font-medium text-fg">{label}</legend>
       <div className="flex flex-wrap gap-2" role="group" aria-labelledby={`${id}-legend`}>
         {all.map((o) => {
           const on = value.includes(o.value);
@@ -84,10 +91,8 @@ export function ChipGroup({ label, options, value, onChange, addLabel, addPlaceh
               type="button"
               aria-pressed={on}
               onClick={() => toggle(o.value)}
-              className={`min-h-11 rounded-full border px-4 text-base font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${
-                on
-                  ? "border-emerald-700 bg-emerald-700 text-white"
-                  : "border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+              className={`min-h-11 rounded-full border px-4 text-base font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                on ? "border-accent bg-accent text-accent-fg" : "border-border bg-card text-fg hover:bg-bg"
               }`}
             >
               {on ? "✓ " : ""}
@@ -129,7 +134,7 @@ function AddChip({ id, label, placeholder, onAdd }: { id: string; label: string;
         type="button"
         variant="secondary"
         onClick={(e) => {
-          const input = (e.currentTarget.previousElementSibling as HTMLInputElement | null);
+          const input = e.currentTarget.previousElementSibling as HTMLInputElement | null;
           const v = input?.value.trim();
           if (input && v) {
             onAdd(v);

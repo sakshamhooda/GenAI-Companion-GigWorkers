@@ -4,12 +4,13 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import AppShell from "@/components/AppShell";
 import MicButton from "@/components/MicButton";
 import { Button, ErrorText, Input } from "@/components/ui";
-import { api, getLang, type ChatMessage } from "@/lib/api";
+import { api, type ChatMessage } from "@/lib/api";
+import { useLang } from "@/lib/useLang";
 import { t } from "@/lib/i18n";
 
 /** Chat with Saathi: history, text or voice input, quick chips for safety, schemes and documents. */
 export default function ChatPage() {
-  const lang = getLang();
+  const lang = useLang();
   const s = t(lang);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");

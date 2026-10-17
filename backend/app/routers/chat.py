@@ -9,6 +9,7 @@ from app.db import get_session
 from app.llm import generate
 from app.models import Message, User
 from app.routers.earnings import recent_earnings
+from app.routers.problems import recent_problem_lines
 from app.schemas import ChatIn, ChatOut, MessageOut
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -35,6 +36,8 @@ async def chat(
     session: AsyncSession = Depends(get_session),
 ) -> ChatOut:
     earnings = await recent_earnings(session, user.id, 7)
+    monthly = await recent_earnings(session, user.id, 30)
+    issues = await recent_problem_lines(session, user.id)
     recent = await session.scalars(
         select(Message)
         .where(Message.user_id == user.id)
@@ -49,7 +52,7 @@ async def chat(
 
     transcript = "\n".join(_line(m) for m in reversed(list(recent)))
     prompt = (
-        f"{build_context(user, earnings)}\n\n"
+        f"{build_context(user, earnings, monthly, issues)}\n\n"
         f"RECENT CONVERSATION\n{transcript or '(none)'}\n\n"
         f"Worker: {worker_input(body.message)}\nSaathi:"
     )

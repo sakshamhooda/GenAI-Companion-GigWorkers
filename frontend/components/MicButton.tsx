@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { api, getLang, type Transcript } from "@/lib/api";
 import { t } from "@/lib/i18n";
+import { useLang } from "@/lib/useLang";
 
 const MAX_SECONDS = 30;
 
@@ -16,7 +17,7 @@ type State = "idle" | "recording" | "transcribing";
 
 /** Press to record a voice note (max 30 s), press again to stop. Sends it to /voice/transcribe. */
 export default function MicButton({ onTranscript, size = "md", className = "" }: Props) {
-  const s = t(getLang());
+  const s = t(useLang());
   const [state, setState] = useState<State>("idle");
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState("");

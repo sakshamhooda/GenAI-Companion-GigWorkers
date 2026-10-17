@@ -27,6 +27,38 @@ log = logging.getLogger(__name__)
 router = APIRouter(tags=["auth"])
 
 LOGIN_LOCKOUT_WINDOW = 15 * 60
+DEMO_GOOGLE_CREDENTIAL = "demo"
+DEMO_GOOGLE_SUB = "demo-google"
+
+
+async def _demo_google_user(session: AsyncSession) -> AuthOut:
+    """Find or create the seeded Google-style demo worker (demo mode only)."""
+    user = await session.scalar(select(User).where(User.google_sub == DEMO_GOOGLE_SUB))
+    is_new = user is None
+    if user is None:
+        user = User(
+            phone=None,
+            pin_hash="",
+            google_sub=DEMO_GOOGLE_SUB,
+            email="demo.google@saathi.app",
+            name="Demo (Google)",
+            language="hi",
+            work_type=join_csv(["driver"]),
+            platform=join_csv(["Uber"]),
+            city="Pune",
+            memory="",
+        )
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+    return AuthOut(token=create_token(user.id), user=UserOut.from_user(user), is_new=is_new)
+
+
+@router.get("/auth/google/config")
+async def google_config() -> dict[str, bool]:
+    """Public: tells the frontend whether to render the real button, the demo button, or nothing."""
+    enabled = bool(settings.google_client_id)
+    return {"enabled": enabled, "demo": (not enabled) and settings.google_demo_mode}
 
 
 @router.get("/languages", response_model=list[LanguageOut])
@@ -84,8 +116,15 @@ async def login(
     dependencies=[Depends(ratelimit.per_ip("google", 10))],
 )
 async def google_sign_in(body: GoogleIn, session: AsyncSession = Depends(get_session)) -> AuthOut:
-    """Exchange a Google Identity Services ID token for a Saathi session."""
+    """Exchange a Google Identity Services ID token for a Saathi session.
+
+    Without a client id, demo mode (``GOOGLE_DEMO_MODE=true``) accepts the literal
+    credential "demo" and signs in a seeded Google-style worker so the flow can be shown.
+    With a client id configured, demo credentials are never accepted.
+    """
     if not settings.google_client_id:
+        if settings.google_demo_mode and body.credential == DEMO_GOOGLE_CREDENTIAL:
+            return await _demo_google_user(session)
         raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "Google sign-in not configured")
     try:
         from google.auth.transport import requests as google_requests

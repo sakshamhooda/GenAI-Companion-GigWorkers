@@ -11,7 +11,16 @@ from fastapi.responses import JSONResponse
 from app.config import DEFAULT_SECRET_KEY, settings
 from app.db import check_database
 from app.llm import LLMUnavailable
-from app.routers import auth, chat, earnings, grievances, onboarding, voice
+from app.routers import (
+    auth,
+    chat,
+    connectors,
+    earnings,
+    grievances,
+    onboarding,
+    problems,
+    voice,
+)
 from app.security import SecurityHeadersMiddleware
 from app.seed import seed_demo
 
@@ -51,6 +60,8 @@ app.include_router(chat.router)
 app.include_router(grievances.router)
 app.include_router(onboarding.router)
 app.include_router(voice.router)
+app.include_router(connectors.router)
+app.include_router(problems.router)
 
 
 @app.exception_handler(LLMUnavailable)

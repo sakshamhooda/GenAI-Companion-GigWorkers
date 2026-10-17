@@ -2,7 +2,18 @@
 
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Float, ForeignKey, Index, Integer, String, Text, func
+from sqlalchemy import (
+    Date,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -40,6 +51,8 @@ class Earning(Base):
     expenses: Mapped[float] = mapped_column(Float, default=0.0)
     platform: Mapped[str] = mapped_column(String(50), default="")
     note: Mapped[str] = mapped_column(Text, default="")
+    # Hours worked that day (migration 0004). Optional: workers often don't track it.
+    hours: Mapped[float | None] = mapped_column(Float, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -65,4 +78,33 @@ class Grievance(Base):
     description: Mapped[str] = mapped_column(Text)
     draft_local: Mapped[str] = mapped_column(Text, default="")
     draft_english: Mapped[str] = mapped_column(Text, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Connection(Base):
+    """A worker's relationship with a platform connector (migration 0005)."""
+
+    __tablename__ = "connections"
+    __table_args__ = (
+        UniqueConstraint("user_id", "connector", name="uq_connections_user_connector"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    connector: Mapped[str] = mapped_column(String(50))
+    status: Mapped[str] = mapped_column(String(20))  # connected | interested
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class Problem(Base):
+    """A "Meri Samasya" analysis: the worker's description and the structured result."""
+
+    __tablename__ = "problems"
+    __table_args__ = (Index("ix_problems_user_created", "user_id", "created_at"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    text: Mapped[str] = mapped_column(Text)
+    result_json: Mapped[str] = mapped_column(Text)
+    category: Mapped[str] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

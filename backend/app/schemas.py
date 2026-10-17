@@ -130,7 +130,8 @@ class LoginIn(BaseModel):
 
 
 class GoogleIn(BaseModel):
-    credential: str = Field(min_length=20, max_length=4096)
+    # Real ID tokens are hundreds of chars; "demo" is accepted only in demo mode (see auth router).
+    credential: str = Field(min_length=4, max_length=4096)
 
 
 class AuthOut(BaseModel):
@@ -172,6 +173,7 @@ class EarningIn(BaseModel):
     platform: str = Field(default="", max_length=MAX_LIST_ITEM_LEN)
     date: dt.date | None = None
     note: str = Field(default="", max_length=500)
+    hours: float | None = Field(default=None, ge=0, le=24)
 
 
 class EarningOut(BaseModel):
@@ -181,8 +183,104 @@ class EarningOut(BaseModel):
     expenses: float
     platform: str
     note: str
+    hours: float | None = None
 
     model_config = {"from_attributes": True}
+
+
+class AnalyticsTotals(BaseModel):
+    amount: float
+    expenses: float
+    net: float
+    hours: float
+    net_per_hour: float | None
+
+
+class PlatformStats(AnalyticsTotals):
+    platform: str
+    entries: int
+
+
+class DayStats(BaseModel):
+    date: dt.date
+    net: float
+    hours: float
+
+
+class AnalyticsOut(BaseModel):
+    days: int
+    totals: AnalyticsTotals
+    by_platform: list[PlatformStats]
+    by_day: list[DayStats]
+    best_platform: str | None
+    insight: str
+
+
+class ConnectorOut(BaseModel):
+    id: str
+    name: str
+    kind: str  # available | demo | coming_soon
+    description: str
+    icon: str
+    status: str  # connected | interested | none
+
+
+class ConnectResult(BaseModel):
+    status: str
+    synced: int = 0
+
+
+class ScreenshotEntry(BaseModel):
+    date: dt.date | None = None
+    amount: float = 0
+    expenses: float = 0
+    hours: float | None = None
+    note: str = ""
+
+
+class ScreenshotImportOut(BaseModel):
+    platform: str
+    entries: list[ScreenshotEntry]
+
+
+class ProblemIn(BaseModel):
+    text: str = Field(min_length=1, max_length=4000)
+
+
+class ProblemRight(BaseModel):
+    kb_id: str
+    title: str
+    what_it_says: str
+
+
+class ProblemOption(BaseModel):
+    title: str
+    effort: str = "medium"
+    time: str = ""
+    cost: str = ""
+    steps: list[str] = Field(default_factory=list)
+    documents: list[str] = Field(default_factory=list)
+
+
+class ProblemContact(BaseModel):
+    name: str
+    number: str
+
+
+class ProblemResult(BaseModel):
+    category: str
+    urgency: str
+    summary: str
+    rights: list[ProblemRight]
+    options: list[ProblemOption]
+    contacts: list[ProblemContact]
+    disclaimer: str
+
+
+class ProblemOut(ProblemResult):
+    id: int
+    text: str
+    created_at: dt.datetime | None = None
 
 
 class EarningsSummary(BaseModel):
@@ -202,6 +300,7 @@ class ParsedEarning(BaseModel):
     platform: str = ""
     date: dt.date
     note: str = ""
+    hours: float | None = None
 
 
 class ChatIn(BaseModel):

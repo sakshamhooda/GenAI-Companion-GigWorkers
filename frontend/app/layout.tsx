@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import LangSync from "@/components/LangSync";
+import { THEME_BOOT_SCRIPT } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,13 +11,20 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#047857",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#047857" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="hi" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+    <html lang="hi" className="h-full antialiased" suppressHydrationWarning>
+      <head>
+        {/* Applies the stored/device theme before first paint so there is no flash. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+      </head>
+      <body className="flex min-h-full flex-col bg-bg text-fg">
         <LangSync />
         {children}
       </body>

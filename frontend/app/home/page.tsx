@@ -5,14 +5,15 @@ import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import QuickAdd from "@/components/QuickAdd";
 import { Card } from "@/components/ui";
-import { api, getLang, type EarningsSummary, type User } from "@/lib/api";
+import { api, type EarningsSummary, type User } from "@/lib/api";
 import { t } from "@/lib/i18n";
+import { useLang } from "@/lib/useLang";
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
-/** Home: greeting, this week's earnings summary, quick-add, and shortcuts to chat and help. */
+/** Home: greeting, this week's earnings summary, quick-add, shortcuts, and the connectors card. */
 export default function HomePage() {
-  const s = t(getLang());
+  const s = t(useLang());
   const [user, setUser] = useState<User | null>(null);
   const [summary, setSummary] = useState<EarningsSummary | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -35,22 +36,18 @@ export default function HomePage() {
   return (
     <AppShell>
       <div className="space-y-4">
-        <h2 className="text-xl font-bold">
-          {user ? `${s.greeting}, ${user.name}` : s.loading}
-        </h2>
+        <h2 className="text-xl font-bold">{user ? `${s.greeting}, ${user.name}` : s.loading}</h2>
 
         <Card>
-          <h3 className="text-sm font-medium text-zinc-600 dark:text-zinc-300">{s.thisWeek}</h3>
-          <p className="mt-1 text-3xl font-extrabold text-emerald-800 dark:text-emerald-400">
-            {summary ? inr(summary.net) : "—"}
-          </p>
+          <h3 className="text-sm font-medium text-muted">{s.thisWeek}</h3>
+          <p className="mt-1 text-3xl font-extrabold text-accent">{summary ? inr(summary.net) : "—"}</p>
           <dl className="mt-2 grid grid-cols-2 gap-2 text-sm">
             <div>
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.earned}</dt>
+              <dt className="text-muted">{s.earned}</dt>
               <dd className="font-semibold">{summary ? inr(summary.total_amount) : "—"}</dd>
             </div>
             <div>
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.expenses}</dt>
+              <dt className="text-muted">{s.expenses}</dt>
               <dd className="font-semibold">{summary ? inr(summary.total_expenses) : "—"}</dd>
             </div>
           </dl>
@@ -61,17 +58,29 @@ export default function HomePage() {
         <div className="grid grid-cols-2 gap-3">
           <Link
             href="/chat"
-            className="flex min-h-14 items-center justify-center rounded-2xl bg-emerald-700 px-3 text-center text-base font-semibold text-white hover:bg-emerald-800"
+            className="flex min-h-14 items-center justify-center rounded-2xl bg-accent px-3 text-center text-base font-semibold text-accent-fg hover:opacity-90"
           >
             {s.askSaathi}
           </Link>
           <Link
-            href="/grievance"
-            className="flex min-h-14 items-center justify-center rounded-2xl border border-zinc-300 bg-white px-3 text-center text-base font-semibold text-zinc-900 hover:bg-zinc-100 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
+            href="/help"
+            className="flex min-h-14 items-center justify-center rounded-2xl border border-border bg-card px-3 text-center text-base font-semibold text-fg hover:bg-bg"
           >
-            {s.draftComplaint}
+            {s.help}
           </Link>
         </div>
+
+        <Link href="/connectors" className="block">
+          <Card className="flex items-center gap-3 hover:bg-bg">
+            <span aria-hidden="true" className="text-2xl">
+              🔌
+            </span>
+            <span>
+              <span className="block font-semibold">{s.connectors}</span>
+              <span className="block text-sm text-muted">{s.connectAppsText}</span>
+            </span>
+          </Card>
+        </Link>
       </div>
     </AppShell>
   );

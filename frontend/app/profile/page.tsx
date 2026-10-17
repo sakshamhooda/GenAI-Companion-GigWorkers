@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
+import { useLang } from "@/lib/useLang";
 import AppShell from "@/components/AppShell";
 import { applyLang } from "@/components/LangSync";
 import { Button, Card, ChipGroup, ErrorText, Input, Label, Select } from "@/components/ui";
-import { api, clearToken, getLang, setLang, type User } from "@/lib/api";
+import { api, clearToken, setLang, type User } from "@/lib/api";
 import { LANGUAGES, PLATFORMS, WORK_TYPES, t } from "@/lib/i18n";
 
 type Editable = Pick<User, "name" | "language" | "work_types" | "platforms" | "city">;
@@ -13,7 +15,7 @@ type Editable = Pick<User, "name" | "language" | "work_types" | "platforms" | "c
 /** Profile: editable name, language, work types, platforms, city; memory note; WhatsApp (coming soon); logout. */
 export default function ProfilePage() {
   const router = useRouter();
-  const [lang, setLangState] = useState(getLang);
+  const lang = useLang();
   const s = t(lang);
   const [user, setUser] = useState<User | null>(null);
   const [form, setForm] = useState<Editable | null>(null);
@@ -48,7 +50,6 @@ export default function ProfilePage() {
       setUser(u);
       setLang(u.language);
       applyLang(u.language);
-      setLangState(u.language);
       setSaved(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
@@ -126,6 +127,13 @@ export default function ProfilePage() {
             {user?.memory?.trim() ? user.memory : s.nothingYet}
           </p>
         </Card>
+
+        <Link href="/connectors" className="block">
+          <Card className="hover:bg-bg">
+            <h3 className="font-semibold">🔌 {s.connectors}</h3>
+            <p className="text-sm text-muted">{s.connectAppsText}</p>
+          </Card>
+        </Link>
 
         <Card className="border-emerald-300 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950">
           <h3 className="mb-1 font-semibold">

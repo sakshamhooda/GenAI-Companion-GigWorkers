@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     sarvam_api_key: str | None = None
     gemini_model: str = "gemini-3.8-flash"
     google_client_id: str | None = None
+    # Without a client id, lets the "demo" credential sign in a seeded Google-style user.
+    google_demo_mode: bool = False
     trusted_hosts: str = "*"
     rate_limit_enabled: bool = True
 

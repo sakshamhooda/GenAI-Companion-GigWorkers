@@ -24,6 +24,7 @@ export type Earning = {
   date: string;
   amount: number;
   expenses: number;
+  hours?: number | null;
   platform: string;
   note: string | null;
 };
@@ -38,9 +39,75 @@ export type EarningsSummary = {
 export type ParsedEarning = {
   amount: number;
   expenses: number;
+  hours?: number | null;
   platform: string | null;
   date: string;
   note: string | null;
+};
+
+export type PlatformStats = {
+  platform: string;
+  amount: number;
+  expenses: number;
+  net: number;
+  hours: number;
+  net_per_hour: number | null;
+  entries: number;
+};
+
+export type Analytics = {
+  days: number;
+  totals: { amount: number; expenses: number; net: number; hours: number; net_per_hour: number | null };
+  by_platform: PlatformStats[];
+  by_day: { date: string; net: number; hours: number }[];
+  best_platform: string | null;
+  insight: string;
+};
+
+export type Connector = {
+  id: string;
+  name: string;
+  kind: "available" | "demo" | "coming_soon";
+  description: string;
+  icon: string;
+  status: "connected" | "interested" | "none";
+};
+
+export type ConnectResult = { status: Connector["status"]; synced?: number };
+
+export type ScreenshotEntry = {
+  date: string;
+  amount: number;
+  expenses: number;
+  hours: number | null;
+  note: string | null;
+};
+
+export type ScreenshotImport = { platform: string | null; entries: ScreenshotEntry[] };
+
+export type ProblemResult = {
+  category: string;
+  urgency: "low" | "medium" | "high" | string;
+  summary: string;
+  rights: { kb_id: string; title: string; what_it_says: string }[];
+  options: {
+    title: string;
+    effort: "low" | "medium" | "high" | string;
+    time: string;
+    cost: string;
+    steps: string[];
+    documents: string[];
+  }[];
+  contacts: { name: string; number: string }[];
+  disclaimer: string;
+};
+
+export type ProblemRecord = {
+  id: number;
+  category: string;
+  text: string;
+  result: ProblemResult;
+  created_at: string;
 };
 
 export type ChatMessage = {
@@ -99,12 +166,31 @@ export const setToken = (t: string) => safeSet(TOKEN_KEY, t);
 export const clearToken = () => {
   safeSet(TOKEN_KEY, null);
   safeSet(LANG_KEY, null);
+  notifyLang();
 };
+
+/** Listeners re-rendered by `useLang()` whenever the stored language changes. */
+const langListeners = new Set<() => void>();
+function notifyLang() {
+  for (const fn of langListeners) fn();
+}
+
+export const subscribeLang = (fn: () => void) => {
+  langListeners.add(fn);
+  return () => {
+    langListeners.delete(fn);
+  };
+};
+
 export const getLang = () => {
   const stored = safeGet(LANG_KEY);
   return isSupportedLang(stored) ? stored : DEFAULT_LANG;
 };
-export const setLang = (l: string) => safeSet(LANG_KEY, l);
+
+export const setLang = (l: string) => {
+  safeSet(LANG_KEY, l);
+  notifyLang();
+};
 
 export class ApiError extends Error {
   status: number;
@@ -114,7 +200,7 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(method: "GET" | "POST" | "PUT", path: string, body?: unknown): Promise<T> {
+async function request<T>(method: "GET" | "POST" | "PUT" | "DELETE", path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -161,5 +247,6 @@ export const api = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
   put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
+  delete: <T>(path: string) => request<T>("DELETE", path),
   upload,
 };

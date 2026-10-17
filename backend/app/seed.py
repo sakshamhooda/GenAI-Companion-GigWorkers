@@ -15,12 +15,12 @@ DEMO_PLATFORMS = ["Zomato", "Swiggy"]
 DEMO_WORK_TYPES = ["delivery"]
 
 _DEMO_EARNINGS = [
-    (6, 720, 110, "Zomato", "12 orders, evening"),
-    (5, 850, 120, "Zomato", "15 orders"),
-    (4, 600, 80, "Swiggy", "rain, slow day"),
-    (3, 950, 150, "Zomato", "weekend surge"),
-    (2, 780, 100, "Swiggy", "14 orders"),
-    (1, 690, 90, "Zomato", "one order cancelled, ₹50 deducted"),
+    (6, 720, 110, "Zomato", "12 orders, evening", 5.0),
+    (5, 850, 120, "Zomato", "15 orders", 6.0),
+    (4, 600, 80, "Swiggy", "rain, slow day", 4.0),
+    (3, 950, 150, "Zomato", "weekend surge", 7.0),
+    (2, 780, 100, "Swiggy", "14 orders", 5.5),
+    (1, 690, 90, "Zomato", "one order cancelled, ₹50 deducted", 5.0),
 ]
 
 
@@ -34,9 +34,17 @@ async def seed_demo() -> None:
     async with get_sessionmaker()() as session:
         user = await session.scalar(select(User).where(User.phone == DEMO_PHONE))
         if user is not None:
-            # Keep the demo profile current without touching anything else.
+            # Keep the demo profile current without touching anything else, and backfill
+            # hours on seeded entries created before migration 0004.
             user.platform = join_csv(DEMO_PLATFORMS)
             user.work_type = join_csv(DEMO_WORK_TYPES)
+            rows = await session.scalars(
+                select(Earning).where(Earning.user_id == user.id, Earning.hours.is_(None))
+            )
+            today = date.today()
+            by_date = {today - timedelta(days=d): h for d, _, _, _, _, h in _DEMO_EARNINGS}
+            for row in rows:
+                row.hours = by_date.get(row.date, 5.0)
             await session.commit()
             return
         user = User(
@@ -52,7 +60,7 @@ async def seed_demo() -> None:
         session.add(user)
         await session.flush()
         today = date.today()
-        for days_ago, amount, expenses, platform, note in _DEMO_EARNINGS:
+        for days_ago, amount, expenses, platform, note, hours in _DEMO_EARNINGS:
             session.add(
                 Earning(
                     user_id=user.id,
@@ -61,6 +69,7 @@ async def seed_demo() -> None:
                     expenses=expenses,
                     platform=platform,
                     note=note,
+                    hours=hours,
                 )
             )
         await session.commit()

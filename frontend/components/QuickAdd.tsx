@@ -1,17 +1,18 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import { api, getLang, type Earning, type ParsedEarning } from "@/lib/api";
+import { api, type Earning, type ParsedEarning } from "@/lib/api";
 import { t } from "@/lib/i18n";
+import { useLang } from "@/lib/useLang";
 import MicButton from "@/components/MicButton";
 import { Button, Card, ErrorText, Input, Label } from "@/components/ui";
 
 /**
- * Natural-language earnings entry. Text or voice ("aaj 850 kamaye, 120 petrol") is parsed by
- * the backend, shown in an editable mini-form, and saved on confirm. Calls `onAdded` after save.
+ * Natural-language earnings entry. Text or voice ("aaj 850 kamaye, 120 petrol, 4 ghante") is
+ * parsed by the backend, shown in an editable mini-form, and saved on confirm.
  */
 export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
-  const s = t(getLang());
+  const s = t(useLang());
   const [text, setText] = useState("");
   const [parsed, setParsed] = useState<ParsedEarning | null>(null);
   const [busy, setBusy] = useState(false);
@@ -37,8 +38,11 @@ export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
     setBusy(true);
     setError("");
     try {
-      const { platform, ...rest } = parsed;
-      await api.post<Earning>("/earnings", platform ? { ...rest, platform } : rest);
+      const { platform, hours, ...rest } = parsed;
+      const body: Record<string, unknown> = { ...rest };
+      if (platform) body.platform = platform;
+      if (hours !== null && hours !== undefined) body.hours = hours;
+      await api.post<Earning>("/earnings", body);
       setParsed(null);
       setText("");
       onAdded();
@@ -101,6 +105,19 @@ export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
               />
             </div>
             <div>
+              <Label htmlFor="qa-hours">{s.hours}</Label>
+              <Input
+                id="qa-hours"
+                type="number"
+                inputMode="decimal"
+                step={0.5}
+                min={0}
+                max={24}
+                value={parsed.hours ?? ""}
+                onChange={(e) => setParsed({ ...parsed, hours: e.target.value === "" ? null : Number(e.target.value) })}
+              />
+            </div>
+            <div className="col-span-2">
               <Label htmlFor="qa-date">{s.date}</Label>
               <Input
                 id="qa-date"

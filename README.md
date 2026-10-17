@@ -99,7 +99,8 @@ Backend:
 
 ```bash
 cd backend
-cp .env.example .env        # fill in DATABASE_URL and keys (optional)
+# create backend/.env (gitignored) with DATABASE_URL and, optionally,
+# GEMINI_API_KEY, SARVAM_API_KEY, SECRET_KEY; see the variables table in docs/architecture.md
 uv sync --all-groups
 uv run alembic upgrade head
 uv run uvicorn app.main:app --reload
@@ -110,7 +111,7 @@ Frontend:
 
 ```bash
 cd frontend
-cp .env.example .env.local
+# create frontend/.env.local (gitignored) with NEXT_PUBLIC_API_URL=http://localhost:8000
 npm install
 npm run dev
 # http://localhost:3000
@@ -143,4 +144,4 @@ Required service variables on Railway:
 - `backend`: `DATABASE_URL=${{Postgres.DATABASE_URL}}`, `CORS_ORIGINS=<frontend URL>`, `ENVIRONMENT=production`, `SECRET_KEY`, `GEMINI_API_KEY`, `SARVAM_API_KEY` (optional), `GOOGLE_CLIENT_ID` (optional), `RAILWAY_DOCKERFILE_PATH=backend/Dockerfile`
 - `frontend`: `NEXT_PUBLIC_API_URL=<backend URL>`, `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (optional), `RAILWAY_DOCKERFILE_PATH=frontend/Dockerfile`
 
-No secrets are committed. The `.env.example` files list the variable names each service expects.
+No secrets or environment files are committed. The full variable list with defaults is in [docs/architecture.md](docs/architecture.md).

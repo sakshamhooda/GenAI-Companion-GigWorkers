@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState, type FormEvent } from "react";
 import AppShell from "@/components/AppShell";
 import { Button, Card, ErrorText, Label, Select, Textarea } from "@/components/ui";
-import { api, getLang, type Grievance } from "@/lib/api";
+import { ApiError, api, type Grievance } from "@/lib/api";
 import { t } from "@/lib/i18n";
+import { useLang } from "@/lib/useLang";
 
 function DraftCard({ title, text, lang, copyLabel, copiedLabel }: {
   title: string;
@@ -38,12 +40,16 @@ function DraftCard({ title, text, lang, copyLabel, copiedLabel }: {
   );
 }
 
-/** Help: draft a grievance in the worker's language and formal English, copy it, see past drafts. */
-export default function GrievancePage() {
-  const lang = getLang();
+const KNOWN_KINDS = ["payout_deduction", "unfair_deactivation", "wage_nonpayment", "safety_incident", "other"];
+
+/** Grievance form. `?kind=` and `?text=` (from the problem page) prefill it. */
+function GrievanceForm() {
+  const lang = useLang();
   const s = t(lang);
-  const [kind, setKind] = useState("payout_deduction");
-  const [description, setDescription] = useState("");
+  const params = useSearchParams();
+  const initialKind = params.get("kind") ?? "";
+  const [kind, setKind] = useState(KNOWN_KINDS.includes(initialKind) ? initialKind : "other");
+  const [description, setDescription] = useState(params.get("text") ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<Grievance | null>(null);
@@ -68,70 +74,76 @@ export default function GrievancePage() {
       setResult(res);
       loadPast();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed");
+      if (err instanceof ApiError && err.status === 503) setError(s.aiBusy);
+      else setError(err instanceof Error ? err.message : "Failed");
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <AppShell title={s.draftComplaint}>
-      <div className="space-y-4">
-        <Card>
-          <form onSubmit={submit} className="space-y-3">
-            <div>
-              <Label htmlFor="kind">{s.kind}</Label>
-              <Select id="kind" value={kind} onChange={(e) => setKind(e.target.value)}>
-                {Object.entries(s.kinds).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v}
-                  </option>
-                ))}
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="description">{s.describe}</Label>
-              <Textarea
-                id="description"
-                required
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
-            <ErrorText>{error}</ErrorText>
-            <Button type="submit" className="w-full" disabled={busy || !description.trim()}>
-              {busy ? s.thinking : s.draft}
-            </Button>
-          </form>
-        </Card>
-
-        {result && (
-          <>
-            <DraftCard title={s.draftLocal} text={result.draft_local} lang={lang} copyLabel={s.copy} copiedLabel={s.copied} />
-            <DraftCard title={s.draftEnglish} text={result.draft_english} lang="en" copyLabel={s.copy} copiedLabel={s.copied} />
-          </>
-        )}
-
-        {past.length > 0 && (
-          <section>
-            <h3 className="mb-2 font-semibold">{s.pastDrafts}</h3>
-            <ul className="space-y-2">
-              {past.map((g) => (
-                <li key={g.id}>
-                  <button
-                    type="button"
-                    onClick={() => setResult(g)}
-                    className="min-h-11 w-full rounded-xl border border-zinc-200 bg-white p-3 text-left dark:border-zinc-700 dark:bg-zinc-900"
-                  >
-                    <p className="font-medium">{s.kinds[g.kind as keyof typeof s.kinds] ?? g.kind}</p>
-                    <p className="line-clamp-1 text-sm text-zinc-600 dark:text-zinc-300">{g.description}</p>
-                  </button>
-                </li>
+    <div className="space-y-4">
+      <Card>
+        <form onSubmit={submit} className="space-y-3">
+          <div>
+            <Label htmlFor="kind">{s.kind}</Label>
+            <Select id="kind" value={kind} onChange={(e) => setKind(e.target.value)}>
+              {Object.entries(s.kinds).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
               ))}
-            </ul>
-          </section>
-        )}
-      </div>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="description">{s.describe}</Label>
+            <Textarea id="description" required value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+          <ErrorText>{error}</ErrorText>
+          <Button type="submit" className="w-full" disabled={busy || !description.trim()}>
+            {busy ? s.thinking : s.draft}
+          </Button>
+        </form>
+      </Card>
+
+      {result && (
+        <>
+          <DraftCard title={s.draftLocal} text={result.draft_local} lang={lang} copyLabel={s.copy} copiedLabel={s.copied} />
+          <DraftCard title={s.draftEnglish} text={result.draft_english} lang="en" copyLabel={s.copy} copiedLabel={s.copied} />
+        </>
+      )}
+
+      {past.length > 0 && (
+        <section>
+          <h3 className="mb-2 font-semibold">{s.pastDrafts}</h3>
+          <ul className="space-y-2">
+            {past.map((g) => (
+              <li key={g.id}>
+                <button
+                  type="button"
+                  onClick={() => setResult(g)}
+                  className="min-h-11 w-full rounded-xl border border-border bg-card p-3 text-left"
+                >
+                  <p className="font-medium">{s.kinds[g.kind as keyof typeof s.kinds] ?? g.kind}</p>
+                  <p className="line-clamp-1 text-sm text-muted">{g.description}</p>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  );
+}
+
+/** Help: draft a grievance in the worker's language and formal English, copy it, see past drafts. */
+export default function GrievancePage() {
+  const s = t(useLang());
+  return (
+    <AppShell title={s.draftComplaint}>
+      <Suspense fallback={<p>{s.loading}</p>}>
+        <GrievanceForm />
+      </Suspense>
     </AppShell>
   );
 }

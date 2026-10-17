@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import GoogleButton from "@/components/GoogleButton";
+import TopBar from "@/components/TopBar";
+import { useLang } from "@/lib/useLang";
 import { applyLang } from "@/components/LangSync";
 import MicButton from "@/components/MicButton";
 import { Button, Card, ChipGroup, ErrorText, Input, Label, Select, Textarea } from "@/components/ui";
@@ -44,7 +46,7 @@ const emptyProfile = (language: string): Profile => ({
 export default function RegisterPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>(1);
-  const [lang, setLangState] = useState(getLang());
+  const lang = useLang();
   const [story, setStory] = useState("");
   const [detected, setDetected] = useState<string | null>(null);
   const [profile, setProfile] = useState<Profile>(() => emptyProfile(getLang()));
@@ -88,7 +90,6 @@ export default function RegisterPage() {
   function switchLang(code: string) {
     setLang(code);
     applyLang(code);
-    setLangState(code);
   }
 
   function chooseLang(code: string) {
@@ -183,6 +184,8 @@ export default function RegisterPage() {
   }
 
   return (
+    <>
+    <TopBar />
     <main className="mx-auto w-full max-w-md flex-1 px-4 py-8">
       <Card>
         <StepIndicator step={step} label={s.step} />
@@ -345,7 +348,7 @@ export default function RegisterPage() {
                 {busy ? s.loading : s.createAccount}
               </Button>
             </div>
-            {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+            {(
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3 text-xs uppercase text-zinc-500">
                   <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
@@ -370,6 +373,7 @@ export default function RegisterPage() {
         </p>
       </Card>
     </main>
+    </>
   );
 }
 

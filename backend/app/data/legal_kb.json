@@ -1,0 +1,130 @@
+[
+  {
+    "id": "css_2020_gig",
+    "title": "Code on Social Security, 2020: gig and platform workers",
+    "applies_to": ["delivery", "driver", "home_services", "platform_penalty", "deactivation", "payout_deduction"],
+    "summary": "The Code on Social Security, 2020 is the first central law to define 'gig worker' and 'platform worker' and to provide for social security schemes (life and disability cover, accident insurance, health and maternity benefits, old age protection) for them, funded partly by a contribution from aggregators (1 to 2 percent of their turnover, capped at 5 percent of what they pay workers). The four labour codes came into force on 21 November 2025; the schemes and state rules under them are still being rolled out, so what is actually available differs by state.",
+    "how_to_use": "Register on e-Shram so you are counted as a platform worker. Ask your state labour department which Code schemes are live. Check the current rules; rollout is ongoing.",
+    "source": "Code on Social Security, 2020, sections 2(35), 2(60), 2(61), 109, 114"
+  },
+  {
+    "id": "mv_aggregator_2020",
+    "title": "Motor Vehicle Aggregator Guidelines, 2020",
+    "applies_to": ["driver", "deactivation", "payout_deduction", "platform_penalty"],
+    "summary": "Central guidelines that states adopt for app-based cab and bike aggregators. They say the driver should receive at least 80 percent of the fare, the aggregator must have a grievance process and a 24x7 control room, and a driver should not be removed from the platform without being told the reason and given a chance to respond. States issue their own versions, so details vary.",
+    "how_to_use": "If deactivated or short-paid, ask the platform in writing for the reason and cite the state's aggregator rules. Escalate to the state transport department (RTO) that licenses the aggregator. Check the current rules for your state.",
+    "source": "Motor Vehicle Aggregator Guidelines 2020, revised 2025, Ministry of Road Transport and Highways; state aggregator rules"
+  },
+  {
+    "id": "rajasthan_gig_2023",
+    "title": "Rajasthan Platform Based Gig Workers (Registration and Welfare) Act, 2023",
+    "applies_to": ["delivery", "driver", "home_services", "payout_deduction", "deactivation"],
+    "summary": "India's first state law for gig workers. It sets up a welfare board with worker representatives, a register of gig workers with a unique ID, a welfare fund paid into by aggregators, and a grievance route for workers. Rules and the board's operation are still being rolled out.",
+    "how_to_use": "If you work in Rajasthan, register with the state gig worker board when registration opens and raise grievances through it. Check the current status of the rules.",
+    "source": "Rajasthan Platform Based Gig Workers (Registration and Welfare) Act, 2023"
+  },
+  {
+    "id": "karnataka_gig_2024",
+    "title": "Karnataka Platform Based Gig Workers (Social Security and Welfare) law",
+    "applies_to": ["delivery", "driver", "home_services", "deactivation", "platform_penalty", "payout_deduction"],
+    "summary": "Karnataka's gig worker law (introduced as a bill in 2024, brought in by ordinance in May 2025 and passed by the legislature in 2025) provides for a welfare board and fund, registration of gig workers, transparency about how pay and ratings are decided, and a requirement to give written reasons and notice before removing a worker from a platform, with a grievance process. Check the current status in Karnataka.",
+    "how_to_use": "If you work in Karnataka and are deactivated or penalised without explanation, ask for the written reason and raise it with the platform's grievance officer and the state labour department.",
+    "source": "Karnataka Platform Based Gig Workers (Social Security and Welfare) Act, 2025 (Bill 2024, Ordinance May 2025)"
+  },
+  {
+    "id": "payment_of_wages_1936",
+    "title": "Payment of Wages Act, 1936",
+    "applies_to": ["daily_wage", "wage_nonpayment", "payout_deduction"],
+    "summary": "For employed workers (not independent contractors), wages must be paid on time and deductions are allowed only for reasons the law lists, such as fines after notice, absence, or damage caused by the worker, within limits. Unpaid or wrongly deducted wages can be claimed before the authority appointed under the Act (usually the labour commissioner's office).",
+    "how_to_use": "Collect proof of work and the agreed wage (messages, attendance, witnesses). File a claim with the labour commissioner or the authority under the Act in your district. Gig platform work usually does not count as employment under this law, so it mainly helps daily-wage and contract workers. Since 21 November 2025 these protections continue under the Code on Wages, 2019, which replaced this Act.",
+    "source": "Payment of Wages Act, 1936, sections 5, 7, 15; now Code on Wages, 2019, chapter III (in force from 21 November 2025)"
+  },
+  {
+    "id": "minimum_wages_1948",
+    "title": "Minimum Wages Act, 1948",
+    "applies_to": ["daily_wage", "wage_nonpayment"],
+    "summary": "Employers in scheduled employments (construction, loading, agriculture, shops and many others) must pay at least the minimum wage notified by the state government for that kind of work. A worker paid less can claim the difference, and the authority can award compensation on top.",
+    "how_to_use": "Find your state's current minimum wage for your category of work (labour department website or office). If you were paid less, file a claim with the labour commissioner. Since 21 November 2025 the Code on Wages, 2019 has replaced this Act and also sets a national floor wage; the claim route is the same. Check the current rates.",
+    "source": "Minimum Wages Act, 1948, sections 12, 20; now Code on Wages, 2019, sections 6, 9, 45 (in force from 21 November 2025)"
+  },
+  {
+    "id": "bocw_1996",
+    "title": "Building and Other Construction Workers (BOCW) Act, 1996",
+    "applies_to": ["daily_wage", "accident", "wage_nonpayment"],
+    "summary": "Construction workers can register with their state's Building and Other Construction Workers Welfare Board. Registered workers can get benefits such as accident compensation, medical help, pension after a certain age, education help for children, and housing or marriage assistance, funded by a cess on construction projects.",
+    "how_to_use": "Register with your state BOCW welfare board (needs age proof, proof of 90 days of construction work in the last year, and photos). Renew yearly. Claims are filed through the board or its online portal.",
+    "source": "Building and Other Construction Workers (Regulation of Employment and Conditions of Service) Act, 1996, sections 12, 22"
+  },
+  {
+    "id": "posh_2013",
+    "title": "Sexual Harassment of Women at Workplace (Prevention, Prohibition and Redressal) Act, 2013",
+    "applies_to": ["harassment"],
+    "summary": "Every workplace with 10 or more workers must have an Internal Committee to hear sexual harassment complaints; smaller or unorganised workplaces are covered by the district Local Committee. The Act covers women workers including contract, daily-wage and platform workers, and a complaint can usually be made within three months of the incident.",
+    "how_to_use": "Write down what happened with dates. Complain to the platform or employer's Internal Committee, or to the district Local Committee (through the District Officer / Collector) if there is none. For assault or threats, also file an FIR with the police.",
+    "source": "POSH Act, 2013, sections 2, 4, 6, 9"
+  },
+  {
+    "id": "zero_fir",
+    "title": "Right to file a Zero FIR and get a free copy",
+    "applies_to": ["accident", "harassment", "police_rto"],
+    "summary": "For a serious (cognizable) offence such as assault, theft or a hit-and-run, any police station must register your complaint even if the incident happened elsewhere; this is called a Zero FIR and is then transferred to the right station. You are entitled to a free copy of the FIR. Complaints can also be filed online or by email in many states.",
+    "how_to_use": "Go to the nearest police station, state clearly what happened, and ask for a Zero FIR if they say it is not their area. Take the FIR copy; you will need it for insurance and compensation claims. If the police refuse, you can write to the Superintendent of Police or approach a magistrate.",
+    "source": "Bharatiya Nagarik Suraksha Sanhita, 2023, section 173 (earlier CrPC section 154)"
+  },
+  {
+    "id": "mv_accident_compensation",
+    "title": "Road accident compensation under the Motor Vehicles Act",
+    "applies_to": ["accident", "driver", "delivery"],
+    "summary": "If you are injured in a road accident, you can claim compensation from the vehicle owner and insurer before the Motor Accident Claims Tribunal (MACT). There is also a fixed no-fault payment and a government scheme for hit-and-run victims where the vehicle cannot be traced. Many platforms also provide accident insurance for active workers; claims need a police report and medical records.",
+    "how_to_use": "Get medical treatment and keep all bills and records. File an FIR. Inform the platform in the app and ask about its accident insurance. For a MACT claim, file at the tribunal in your district (free legal aid can help).",
+    "source": "Motor Vehicles Act, 1988, sections 161 (hit and run), 164 (no fault), 166 (claims)"
+  },
+  {
+    "id": "eshram",
+    "title": "e-Shram registration for unorganised and gig workers",
+    "applies_to": ["delivery", "driver", "home_services", "daily_wage"],
+    "summary": "e-Shram is the central government's register of unorganised workers, including gig and platform workers. Registration is free and gives a Universal Account Number card. It is the entry point for several central and state welfare schemes and for accident insurance cover linked to the registration.",
+    "how_to_use": "Register at eshram.gov.in or a Common Service Centre with your Aadhaar, mobile number linked to Aadhaar, and bank details. Keep the e-Shram card; schemes and state gig worker boards often ask for it.",
+    "source": "Ministry of Labour and Employment, e-Shram portal"
+  },
+  {
+    "id": "pm_sym",
+    "title": "Pradhan Mantri Shram Yogi Maan-dhan (PM-SYM) pension",
+    "applies_to": ["delivery", "driver", "home_services", "daily_wage"],
+    "summary": "A voluntary pension scheme for unorganised workers aged 18 to 40 with monthly income up to 15,000 rupees who are not covered by EPF, ESIC or NPS. The worker pays a small monthly amount (roughly 55 to 200 rupees depending on age) and the government matches it; at 60 the worker gets a monthly pension of 3,000 rupees.",
+    "how_to_use": "Enrol at a Common Service Centre or through the maandhan.in portal with Aadhaar and a savings bank account. Check the current contribution table and eligibility before enrolling.",
+    "source": "PM-SYM scheme, Ministry of Labour and Employment"
+  },
+  {
+    "id": "nalsa_legal_aid",
+    "title": "Free legal aid (NALSA / District Legal Services Authority)",
+    "applies_to": ["payout_deduction", "deactivation", "wage_nonpayment", "accident", "harassment", "police_rto", "platform_penalty", "other"],
+    "summary": "Under the Legal Services Authorities Act, 1987, free legal aid (a lawyer, help drafting, court fees) is available to women, children, SC/ST persons, victims of trafficking or disaster, persons with disabilities, industrial workmen, people in custody, and anyone with annual income below the state limit. The national helpline is 15100 and every district court has a Legal Services Authority office.",
+    "how_to_use": "Call 15100 or go to the District Legal Services Authority (DLSA) at the district court. Carry ID and any papers about your problem. Legal aid clinics and Lok Adalats can also settle wage and payment disputes quickly.",
+    "source": "Legal Services Authorities Act, 1987, section 12; NALSA helpline 15100"
+  },
+  {
+    "id": "labour_helpline",
+    "title": "Labour helplines and the labour commissioner",
+    "applies_to": ["wage_nonpayment", "daily_wage", "payout_deduction", "other"],
+    "summary": "Wage and working-condition complaints against employers and contractors are handled by the state labour department (labour commissioner, assistant labour commissioner in each district). The central Shram Suvidha portal also takes complaints, and many states run labour helplines.",
+    "how_to_use": "Note the employer or contractor's name, site, dates worked and amount due. Go to the district labour office or file on the Shram Suvidha portal (shramsuvidha.gov.in). For gig platforms, the labour office can help only where a state gig worker law applies; otherwise use the platform grievance route.",
+    "source": "State labour departments; Shram Suvidha portal; Code on Wages, 2019"
+  },
+  {
+    "id": "platform_grievance_ladder",
+    "title": "Platform grievance escalation: in-app, email, grievance officer",
+    "applies_to": ["payout_deduction", "deactivation", "platform_penalty", "delivery", "driver", "home_services"],
+    "summary": "Start with the platform's in-app support and keep ticket numbers. If unresolved, write to the partner support email, then to the company's named grievance officer. E-commerce platforms are required to publish a grievance officer's name and contact and to acknowledge complaints within 48 hours and resolve them within one month under the Consumer Protection (E-Commerce) Rules, 2020; that officer is also the right address for partner complaints in practice. Keep screenshots of orders, payouts and every reply.",
+    "how_to_use": "1) In-app ticket. 2) Email partner support with ticket numbers and screenshots. 3) Email the grievance officer named on the company website. 4) If still unresolved, approach the labour department, state gig worker board, or legal aid, citing the full paper trail.",
+    "source": "Consumer Protection (E-Commerce) Rules, 2020, rule 4(4), 4(5); platform partner terms"
+  },
+  {
+    "id": "pmjjby_pmsby",
+    "title": "PMJJBY and PMSBY: cheap life and accident insurance",
+    "applies_to": ["accident", "delivery", "driver", "daily_wage", "home_services"],
+    "summary": "Two government-backed schemes bought through any bank account: PMJJBY gives 2 lakh rupees life cover for a yearly premium of 436 rupees (ages 18 to 50), and PMSBY gives 2 lakh rupees accidental death or full disability cover (1 lakh for partial disability) for 20 rupees a year (ages 18 to 70). Premiums are auto-debited each year.",
+    "how_to_use": "Ask your bank (or use net banking / the bank app) to enrol in PMJJBY and PMSBY. Keep the nominee details updated. Claims are made through the bank with the death or accident papers.",
+    "source": "Department of Financial Services; PMJJBY and PMSBY scheme rules"
+  }
+]

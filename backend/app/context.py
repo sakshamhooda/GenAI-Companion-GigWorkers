@@ -53,8 +53,33 @@ def _fmt_list(values: list[str]) -> str:
     return ", ".join(values) if values else "unknown"
 
 
-def build_context(user: User, earnings: Sequence[Earning]) -> str:
-    """Plain-text block with profile, memory notes and the last week's earnings."""
+def platform_rates(earnings: Sequence[Earning], default_platform: str) -> list[str]:
+    """One line per platform with net per hour, for entries that have hours."""
+    totals: dict[str, list[float]] = {}
+    for e in earnings:
+        if not e.hours:
+            continue
+        key = e.platform or default_platform or "Other"
+        net, hours = totals.setdefault(key, [0.0, 0.0])
+        totals[key] = [net + e.amount - e.expenses, hours + e.hours]
+    return [
+        f"- {platform}: net ₹{net / hours:.0f} per hour over {hours:g} hours"
+        for platform, (net, hours) in totals.items()
+        if hours > 0
+    ]
+
+
+def build_context(
+    user: User,
+    earnings: Sequence[Earning],
+    monthly: Sequence[Earning] | None = None,
+    recent_issues: Sequence[str] | None = None,
+) -> str:
+    """Plain-text block with profile, memory notes, recent earnings, rates and issues.
+
+    ``monthly`` (last 30 days) is used only for per-platform net-per-hour lines;
+    ``recent_issues`` are short lines from the worker's latest "Meri Samasya" analyses.
+    """
     info = LANGUAGES.get(user.language, {})
     platforms = split_csv(user.platform)
     work_types = split_csv(user.work_type)
@@ -83,4 +108,11 @@ def build_context(user: User, earnings: Sequence[Earning]) -> str:
         lines.append(f"- total earned ₹{total:.0f}, expenses ₹{exp:.0f}, net ₹{total - exp:.0f}")
     else:
         lines.append("- no entries yet")
+    rates = platform_rates(
+        monthly if monthly is not None else earnings, platforms[0] if platforms else ""
+    )
+    if rates:
+        lines += ["", "NET PER HOUR BY PLATFORM (last 30 days)", *rates]
+    if recent_issues:
+        lines += ["", "RECENT ISSUES THE WORKER RAISED", *recent_issues]
     return "\n".join(lines)

@@ -1,5 +1,51 @@
 @import "tailwindcss";
 
+/* Dark mode is class-based (toggle + stored choice), not media-only. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Colour tokens. Light and dark pairs are checked for >= 4.5:1 text contrast. */
+:root {
+  --bg: #fafafa;
+  --fg: #18181b;
+  --card: #ffffff;
+  --muted: #52525b;
+  --accent: #047857;
+  --accent-fg: #ffffff;
+  --border: #d4d4d8;
+}
+
+.dark {
+  --bg: #09090b;
+  --fg: #f4f4f5;
+  --card: #18181b;
+  --muted: #a1a1aa;
+  --accent: #34d399;
+  --accent-fg: #052e16;
+  --border: #3f3f46;
+}
+
+/* Expose tokens as Tailwind colours: bg-bg, text-fg, bg-card, text-muted, bg-accent, border-border. */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-border: var(--border);
+}
+
+html {
+  color-scheme: light;
+  background-color: var(--bg);
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
 body {
+  background-color: var(--bg);
+  color: var(--fg);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Devanagari", sans-serif;
 }

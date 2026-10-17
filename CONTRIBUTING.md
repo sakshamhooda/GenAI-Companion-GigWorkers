@@ -3,10 +3,10 @@
 ## Setup
 
 ```bash
-# backend
-cd backend && cp .env.example .env && uv sync --all-groups
-# frontend
-cd frontend && cp .env.example .env.local && npm install
+# backend (create backend/.env with DATABASE_URL first; variables are listed in docs/architecture.md)
+cd backend && uv sync --all-groups
+# frontend (create frontend/.env.local with NEXT_PUBLIC_API_URL=http://localhost:8000)
+cd frontend && npm install
 # hooks (from the repo root)
 pipx install pre-commit   # or: uv tool install pre-commit
 pre-commit install
@@ -32,4 +32,4 @@ Every change to a router, model or component ships with a test. See [docs/testin
 
 ## Secrets
 
-Never commit `.env*` files or paste keys into code, commits, logs or tests. Use `.env.example` for names only. See [SECURITY.md](SECURITY.md) for reporting.
+Never commit `.env*` files or paste keys into code, commits, logs or tests. Variable names are documented in `docs/architecture.md`, not in example files. See [SECURITY.md](SECURITY.md) for reporting.

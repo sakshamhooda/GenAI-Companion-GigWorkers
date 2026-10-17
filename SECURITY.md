@@ -19,7 +19,7 @@ Email hooda.saksham@gmail.com with the subject "Saathi security". Please do not 
 | Transport | Downgrade, clickjacking, MIME sniffing | HSTS in production, `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy` limiting the microphone to our origin, a Content Security Policy on the web app, trusted-host checking on the API. |
 | Input | Malformed data | Pydantic validation on every body: Indian mobile pattern, 4-digit PIN, bounded lists, amount range, language code allow-list. |
 | Errors | Stack traces leaking internals | A catch-all handler returns `{"detail": "internal error"}` and logs the exception server-side. |
-| Secrets | Keys in the repo | No secrets are committed. `.env` files are ignored; `.env.example` holds names only. Keys live in Railway service variables. |
+| Secrets | Keys in the repo | No secrets or environment files are committed; all `.env*` files are ignored and a pre-commit secrets scan (gitleaks) runs on every commit. Variable names are documented in `docs/architecture.md`. Keys live in Railway service variables. |
 | Dependencies | Known vulnerabilities | Dependabot weekly for npm, pip and GitHub Actions; `pip-audit` and `npm audit` run in CI on every push. |
 
 ## Known limitations
