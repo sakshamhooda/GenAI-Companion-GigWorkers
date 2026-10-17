@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     environment: str = "development"
     database_url: str | None = None
     cors_origins: str = "http://localhost:3000"
+    secret_key: str = "dev-secret-change-me"
+    gemini_api_key: str | None = None
+    sarvam_api_key: str | None = None
+    gemini_model: str = "gemini-3.8-flash"
 
     @property
     def cors_origin_list(self) -> list[str]:
