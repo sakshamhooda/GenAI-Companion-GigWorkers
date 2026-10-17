@@ -7,6 +7,7 @@ import BottomNav from "@/components/BottomNav";
 import { getLang } from "@/lib/api";
 import { t } from "@/lib/i18n";
 
+/** Authenticated page frame: header with profile link, auth guard, content, bottom tabs. */
 export default function AppShell({ title, children }: { title?: string; children: ReactNode }) {
   const s = t(getLang());
   return (

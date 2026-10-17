@@ -24,10 +24,12 @@ DEFAULT_LANGUAGE = "hi"
 
 
 def is_supported(code: str | None) -> bool:
+    """True when `code` is one of the short codes in LANGUAGES."""
     return bool(code) and code in LANGUAGES
 
 
 def language_list() -> list[dict[str, str | bool]]:
+    """Serialisable list for `GET /languages`, one entry per supported language."""
     return [{"code": code, **info} for code, info in LANGUAGES.items()]
 
 

@@ -1,5 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+DEFAULT_SECRET_KEY = "dev-secret-change-me"
+
 
 class Settings(BaseSettings):
     """Runtime configuration, read from environment variables (or a local .env)."""
@@ -10,14 +12,26 @@ class Settings(BaseSettings):
     environment: str = "development"
     database_url: str | None = None
     cors_origins: str = "http://localhost:3000"
-    secret_key: str = "dev-secret-change-me"
+    secret_key: str = DEFAULT_SECRET_KEY
+    token_ttl_seconds: int = 86400
     gemini_api_key: str | None = None
     sarvam_api_key: str | None = None
     gemini_model: str = "gemini-3.8-flash"
+    google_client_id: str | None = None
+    trusted_hosts: str = "*"
+    rate_limit_enabled: bool = True
+
+    @property
+    def is_production(self) -> bool:
+        return self.environment.lower() == "production"
 
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def trusted_host_list(self) -> list[str]:
+        return [h.strip() for h in self.trusted_hosts.split(",") if h.strip()] or ["*"]
 
     @property
     def async_database_url(self) -> str | None:

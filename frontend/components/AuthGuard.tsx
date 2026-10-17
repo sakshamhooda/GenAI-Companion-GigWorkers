@@ -6,6 +6,7 @@ import { getToken } from "@/lib/api";
 
 const subscribe = () => () => {};
 
+/** Renders children only when a session token exists; otherwise redirects to /login. */
 export default function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
   const authed = useSyncExternalStore(subscribe, () => Boolean(getToken()), () => false);

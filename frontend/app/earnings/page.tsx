@@ -9,6 +9,7 @@ import { t } from "@/lib/i18n";
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
+/** Earnings: last 30 days of entries with totals, plus quick-add. */
 export default function EarningsPage() {
   const s = t(getLang());
   const [summary, setSummary] = useState<EarningsSummary | null>(null);

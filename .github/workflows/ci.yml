@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   changes:
     runs-on: ubuntu-latest
@@ -38,9 +41,31 @@ jobs:
           enable-cache: true
       - run: uv python install 3.12
       - run: uv sync --all-groups
-      - run: uv run ruff check .
-      - run: uv run ruff format --check .
-      - run: uv run pytest -q
+      - name: Lint
+        run: uv run ruff check .
+      - name: Format check
+        run: uv run ruff format --check .
+      - name: Migrations apply and roll back cleanly (SQLite)
+        run: |
+          uv run alembic -x url=sqlite:///${{ runner.temp }}/migrate.db upgrade head
+          uv run alembic -x url=sqlite:///${{ runner.temp }}/migrate.db downgrade base
+          uv run alembic -x url=sqlite:///${{ runner.temp }}/migrate.db upgrade head
+      - name: Tests with coverage
+        run: uv run pytest -q --cov-report=xml --cov-report=term-missing
+      - name: Coverage summary
+        if: always()
+        run: |
+          echo "### Backend coverage" >> "$GITHUB_STEP_SUMMARY"
+          uv run python - <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          import xml.etree.ElementTree as ET
+          root = ET.parse("coverage.xml").getroot()
+          print(f"Line coverage: {float(root.get('line-rate')) * 100:.1f}%")
+          EOF
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
 
   frontend:
     needs: changes
@@ -56,6 +81,10 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run build
+      - run: npm ci --legacy-peer-deps
+      - name: Lint
+        run: npm run lint
+      - name: Unit tests
+        run: npm test
+      - name: Build
+        run: npm run build

@@ -45,6 +45,7 @@ def _short_code(bcp47: str | None) -> str | None:
 async def _sarvam(
     audio_bytes: bytes, filename: str, content_type: str, language_hint: str | None
 ) -> dict[str, Any]:
+    """Call Sarvam Saaras. Raises on HTTP or network errors so the caller can fall back."""
     lang = str(LANGUAGES[language_hint]["sarvam"]) if language_hint in LANGUAGES else "unknown"
     data = {"model": SARVAM_MODEL, "language_code": lang, "keyterms": json.dumps(KEYTERMS)}
     async with httpx.AsyncClient(timeout=30.0) as client:
@@ -65,6 +66,7 @@ async def _sarvam(
 
 
 def _gemini(audio_bytes: bytes, content_type: str) -> dict[str, Any]:
+    """Transcribe with Gemini's native audio input. Raises on failure."""
     prompt = (
         "Transcribe this audio exactly, in the original language and its native script. "
         'Return JSON {"transcript": string, "language_code": BCP-47 code like "hi-IN"}.'
@@ -81,7 +83,12 @@ def _gemini(audio_bytes: bytes, content_type: str) -> dict[str, Any]:
 async def transcribe(
     audio_bytes: bytes, filename: str, content_type: str, language_hint: str | None
 ) -> dict[str, Any]:
-    """Return {transcript, language_code, language_probability, provider}."""
+    """Transcribe a short audio clip.
+
+    Order of attempts: Sarvam (if `SARVAM_API_KEY`), then Gemini (if `GEMINI_API_KEY`),
+    then a stub with an empty transcript. Never raises; the `provider` field tells the
+    caller which path produced the result.
+    """
     if settings.sarvam_api_key:
         try:
             return await _sarvam(audio_bytes, filename, content_type, language_hint)

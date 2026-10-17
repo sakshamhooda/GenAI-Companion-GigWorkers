@@ -1,19 +1,24 @@
-from httpx import ASGITransport, AsyncClient
-
-from app.main import app
+from httpx import AsyncClient
 
 
-async def test_root() -> None:
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        res = await client.get("/")
+async def test_root(client: AsyncClient) -> None:
+    res = await client.get("/")
     assert res.status_code == 200
     assert res.json()["status"] == "ok"
 
 
-async def test_health_reports_database_flag() -> None:
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        res = await client.get("/health")
+async def test_health_reports_database_and_llm_flags(client: AsyncClient) -> None:
+    res = await client.get("/health")
     assert res.status_code == 200
     body = res.json()
     assert body["status"] == "ok"
-    assert isinstance(body["database"], bool)
+    assert body["database"] is True  # SQLite test database answers SELECT 1
+    assert body["llm"] is False  # stub mode in tests
+
+
+async def test_languages_endpoint(client: AsyncClient) -> None:
+    res = await client.get("/languages")
+    assert res.status_code == 200
+    codes = {item["code"] for item in res.json()}
+    assert {"hi", "en", "ta", "od", "ur"} <= codes
+    assert len(codes) == 13

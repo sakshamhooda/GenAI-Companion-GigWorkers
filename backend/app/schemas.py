@@ -1,3 +1,5 @@
+"""Request and response models. Field limits here are the API's input-validation layer."""
+
 import datetime as dt
 
 from pydantic import BaseModel, Field, field_validator
@@ -6,6 +8,11 @@ from app.languages import DEFAULT_LANGUAGE, is_supported
 from app.models import User
 from app.util import split_csv
 
+PHONE_PATTERN = r"^[6-9]\d{9}$"
+PIN_PATTERN = r"^\d{4}$"
+MAX_LIST_ITEMS = 10
+MAX_LIST_ITEM_LEN = 40
+
 
 def _check_language(value: str) -> str:
     if not is_supported(value):
@@ -13,9 +20,26 @@ def _check_language(value: str) -> str:
     return value
 
 
+def _check_list(values: list[str] | None) -> list[str] | None:
+    if values is None:
+        return None
+    if len(values) > MAX_LIST_ITEMS:
+        raise ValueError(f"at most {MAX_LIST_ITEMS} items")
+    cleaned = []
+    for v in values:
+        v = str(v).strip()
+        if not v:
+            continue
+        if len(v) > MAX_LIST_ITEM_LEN:
+            raise ValueError(f"items must be at most {MAX_LIST_ITEM_LEN} characters")
+        cleaned.append(v)
+    return cleaned
+
+
 class UserOut(BaseModel):
     id: int
-    phone: str
+    phone: str | None
+    email: str | None = None
     name: str
     language: str
     work_types: list[str]
@@ -29,6 +53,7 @@ class UserOut(BaseModel):
         return cls(
             id=user.id,
             phone=user.phone,
+            email=getattr(user, "email", None),
             name=user.name,
             language=user.language,
             work_types=split_csv(user.work_type),
@@ -40,23 +65,28 @@ class UserOut(BaseModel):
 
 
 class RegisterIn(BaseModel):
-    phone: str = Field(min_length=10, max_length=15, pattern=r"^\d+$")
-    pin: str = Field(min_length=4, max_length=4, pattern=r"^\d{4}$")
-    name: str = Field(min_length=1, max_length=100)
+    phone: str = Field(pattern=PHONE_PATTERN)
+    pin: str = Field(pattern=PIN_PATTERN)
+    name: str = Field(min_length=1, max_length=80)
     language: str = DEFAULT_LANGUAGE
     work_types: list[str] = Field(default_factory=list)
     platforms: list[str] = Field(default_factory=list)
-    city: str = ""
+    city: str = Field(default="", max_length=80)
     memory: str = Field(default="", max_length=2000)
     shift: str | None = Field(default=None, max_length=50)
     # Legacy singular fields, folded into the lists.
-    work_type: str = ""
-    platform: str = ""
+    work_type: str = Field(default="", max_length=MAX_LIST_ITEM_LEN)
+    platform: str = Field(default="", max_length=MAX_LIST_ITEM_LEN)
 
     @field_validator("language")
     @classmethod
     def _lang(cls, v: str) -> str:
         return _check_language(v)
+
+    @field_validator("work_types", "platforms")
+    @classmethod
+    def _lists(cls, v: list[str]) -> list[str]:
+        return _check_list(v) or []
 
     def all_work_types(self) -> list[str]:
         return self.work_types + split_csv(self.work_type)
@@ -73,7 +103,7 @@ class RegisterIn(BaseModel):
 
 class OnboardingIn(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
-    language_hint: str | None = None
+    language_hint: str | None = Field(default=None, max_length=5)
 
 
 class OnboardingOut(BaseModel):
@@ -95,27 +125,37 @@ class TranscriptOut(BaseModel):
 
 
 class LoginIn(BaseModel):
-    phone: str
-    pin: str
+    phone: str = Field(pattern=PHONE_PATTERN)
+    pin: str = Field(pattern=PIN_PATTERN)
+
+
+class GoogleIn(BaseModel):
+    credential: str = Field(min_length=20, max_length=4096)
 
 
 class AuthOut(BaseModel):
     token: str
     user: UserOut
+    is_new: bool = False
 
 
 class UserUpdate(BaseModel):
-    name: str | None = None
+    name: str | None = Field(default=None, min_length=1, max_length=80)
     language: str | None = None
     work_types: list[str] | None = None
     platforms: list[str] | None = None
-    city: str | None = None
-    memory: str | None = None
+    city: str | None = Field(default=None, max_length=80)
+    memory: str | None = Field(default=None, max_length=2000)
 
     @field_validator("language")
     @classmethod
     def _lang(cls, v: str | None) -> str | None:
         return None if v is None else _check_language(v)
+
+    @field_validator("work_types", "platforms")
+    @classmethod
+    def _lists(cls, v: list[str] | None) -> list[str] | None:
+        return _check_list(v)
 
 
 class LanguageOut(BaseModel):
@@ -127,11 +167,11 @@ class LanguageOut(BaseModel):
 
 
 class EarningIn(BaseModel):
-    amount: float = Field(ge=0)
-    expenses: float = Field(default=0, ge=0)
-    platform: str = ""
+    amount: float = Field(ge=0, le=1_000_000)
+    expenses: float = Field(default=0, ge=0, le=1_000_000)
+    platform: str = Field(default="", max_length=MAX_LIST_ITEM_LEN)
     date: dt.date | None = None
-    note: str = ""
+    note: str = Field(default="", max_length=500)
 
 
 class EarningOut(BaseModel):
@@ -153,7 +193,7 @@ class EarningsSummary(BaseModel):
 
 
 class ParseIn(BaseModel):
-    text: str = Field(min_length=1, max_length=1000)
+    text: str = Field(min_length=1, max_length=500)
 
 
 class ParsedEarning(BaseModel):
@@ -165,7 +205,7 @@ class ParsedEarning(BaseModel):
 
 
 class ChatIn(BaseModel):
-    message: str = Field(min_length=1, max_length=4000)
+    message: str = Field(min_length=1, max_length=2000)
 
 
 class ChatOut(BaseModel):
@@ -181,7 +221,7 @@ class MessageOut(BaseModel):
 
 
 class GrievanceIn(BaseModel):
-    kind: str = Field(min_length=1, max_length=50)
+    kind: str = Field(min_length=1, max_length=50, pattern=r"^[a-z_]+$")
     description: str = Field(min_length=1, max_length=4000)
 
 

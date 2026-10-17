@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { getLang } from "@/lib/api";
 import { t } from "@/lib/i18n";
 
+/** Mobile tab bar (Home, Earnings, Chat, Help) with the active route marked via aria-current. */
 export default function BottomNav() {
   const pathname = usePathname();
   const s = t(getLang());

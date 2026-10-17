@@ -1,117 +1,103 @@
-import random
+"""Earnings, chat and grievance flows against the SQLite test database (LLM stubbed)."""
 
-import pytest
-from httpx import ASGITransport, AsyncClient
-from sqlalchemy import delete
+from datetime import date, timedelta
+
+from httpx import AsyncClient
 
 from app import llm
-from app.config import settings
-from app.db import get_sessionmaker
-from app.languages import LANGUAGES, reply_instruction
-from app.main import app
-from app.models import User
-from app.util import join_csv, split_csv
-
-needs_db = pytest.mark.skipif(settings.database_url is None, reason="DATABASE_URL not set")
 
 
-def _client() -> AsyncClient:
-    return AsyncClient(transport=ASGITransport(app=app), base_url="http://test")
+async def test_earnings_create_list_and_summary_math(client: AsyncClient, worker: dict) -> None:
+    h = worker["headers"]
+    today = date.today().isoformat()
+    old = (date.today() - timedelta(days=30)).isoformat()
 
+    res = await client.post("/earnings", json={"amount": 500, "expenses": 50}, headers=h)
+    assert res.status_code == 201, res.text
+    assert res.json()["platform"] == "Zomato"  # defaults to the worker's first platform
 
-def test_csv_helpers() -> None:
-    assert split_csv("Zomato, Swiggy,,") == ["Zomato", "Swiggy"]
-    assert split_csv(None) == []
-    assert join_csv(["Uber", " Uber", "Ola", ""]) == "Uber,Ola"
+    res = await client.post(
+        "/earnings",
+        json={"amount": 300, "expenses": 0, "platform": "Swiggy", "date": today, "note": "x"},
+        headers=h,
+    )
+    assert res.status_code == 201
+    res = await client.post(
+        "/earnings", json={"amount": 999, "expenses": 1, "date": old}, headers=h
+    )
+    assert res.status_code == 201
 
-
-def test_reply_instruction_names_native_language() -> None:
-    assert "தமிழ்" in reply_instruction("ta")
-    assert "Indian English" in reply_instruction("en")
-    assert len(LANGUAGES) == 13
-
-
-async def test_earnings_parse_stub_without_key(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(settings, "gemini_api_key", None)
-    monkeypatch.setattr(llm, "_client", None)
-    data = llm.extract_json("aaj 850 kamaye", stub={"amount": 0})
-    assert data == {"amount": 0}
-    assert llm.generate("hi") == llm.STUB_TEXT
-
-
-async def test_languages_endpoint() -> None:
-    async with _client() as client:
-        res = await client.get("/languages")
+    res = await client.get("/earnings?days=7", headers=h)
     assert res.status_code == 200
-    codes = {item["code"] for item in res.json()}
-    assert {"hi", "en", "ta", "od", "ur"} <= codes
+    body = res.json()
+    assert len(body["entries"]) == 2  # the 30-day-old entry is outside the window
+    assert body["total_amount"] == 800
+    assert body["total_expenses"] == 50
+    assert body["net"] == 750
+
+    res = await client.get("/earnings?days=60", headers=h)
+    assert len(res.json()["entries"]) == 3
 
 
-@needs_db
-async def test_register_login_earnings_flow(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(settings, "gemini_api_key", None)
-    monkeypatch.setattr(llm, "_client", None)
-    phone = "8" + "".join(random.choices("0123456789", k=9))
-    async with app.router.lifespan_context(app):
-        try:
-            async with _client() as client:
-                res = await client.post(
-                    "/auth/register",
-                    json={"phone": phone, "pin": "4321", "name": "Test", "language": "xx"},
-                )
-                assert res.status_code == 422
+async def test_earnings_requires_auth(client: AsyncClient) -> None:
+    assert (await client.get("/earnings")).status_code == 401
+    assert (await client.post("/earnings", json={"amount": 1})).status_code == 401
 
-                res = await client.post(
-                    "/auth/register",
-                    json={
-                        "phone": phone,
-                        "pin": "4321",
-                        "name": "Test",
-                        "language": "ta",
-                        "platforms": ["Uber", "Rapido"],
-                        "work_types": ["driver", "delivery"],
-                        "platform": "Ola",  # legacy singular, folded in
-                    },
-                )
-                assert res.status_code == 201, res.text
-                user = res.json()["user"]
-                assert user["platforms"] == ["Uber", "Rapido", "Ola"]
-                assert user["work_types"] == ["driver", "delivery"]
-                assert "platform" not in user and "work_type" not in user
-                token = res.json()["token"]
-                headers = {"Authorization": f"Bearer {token}"}
 
-                res = await client.post("/auth/login", json={"phone": phone, "pin": "0000"})
-                assert res.status_code == 401
-                res = await client.post("/auth/login", json={"phone": phone, "pin": "4321"})
-                assert res.status_code == 200
+async def test_earnings_parse_stub_uses_worker_platform(client: AsyncClient, worker: dict) -> None:
+    res = await client.post("/earnings/parse", json={"text": "700"}, headers=worker["headers"])
+    assert res.status_code == 200
+    body = res.json()
+    assert body["platform"] == "Zomato"
+    assert set(body) >= {"amount", "expenses", "platform", "date", "note"}
 
-                res = await client.put("/me", json={"platforms": ["Rapido"]}, headers=headers)
-                assert res.status_code == 200 and res.json()["platforms"] == ["Rapido"]
 
-                res = await client.post(
-                    "/earnings", json={"amount": 500, "expenses": 50}, headers=headers
-                )
-                assert res.status_code == 201 and res.json()["platform"] == "Rapido"
-                res = await client.get("/earnings?days=7", headers=headers)
-                body = res.json()
-                assert body["total_amount"] == 500 and body["net"] == 450
+async def test_chat_stores_both_messages(client: AsyncClient, worker: dict) -> None:
+    h = worker["headers"]
+    res = await client.get("/chat/history", headers=h)
+    assert res.status_code == 200 and res.json() == []
 
-                res = await client.post("/earnings/parse", json={"text": "700"}, headers=headers)
-                assert res.status_code == 200 and res.json()["platform"] == "Rapido"
+    res = await client.post("/chat", json={"message": "mujhe safety tips do"}, headers=h)
+    assert res.status_code == 200
+    assert res.json()["reply"] == llm.STUB_TEXT
 
-                res = await client.post("/chat", json={"message": "hello"}, headers=headers)
-                assert res.status_code == 200 and res.json()["reply"] == llm.STUB_TEXT
-                res = await client.get("/chat/history", headers=headers)
-                assert len(res.json()) == 2
+    res = await client.get("/chat/history", headers=h)
+    history = res.json()
+    assert [m["role"] for m in history] == ["user", "assistant"]
+    assert history[0]["content"] == "mujhe safety tips do"
+    assert history[1]["content"] == llm.STUB_TEXT
 
-                res = await client.post(
-                    "/grievances/draft",
-                    json={"kind": "deduction", "description": "50 cut"},
-                    headers=headers,
-                )
-                assert res.status_code == 201 and "[stub]" in res.json()["draft_local"]
-        finally:
-            async with get_sessionmaker()() as session:
-                await session.execute(delete(User).where(User.phone == phone))
-                await session.commit()
+
+async def test_chat_rejects_empty_message(client: AsyncClient, worker: dict) -> None:
+    res = await client.post("/chat", json={"message": ""}, headers=worker["headers"])
+    assert res.status_code == 422
+
+
+async def test_grievance_draft_and_list(client: AsyncClient, worker: dict) -> None:
+    h = worker["headers"]
+    res = await client.post(
+        "/grievances/draft",
+        json={"kind": "payout_deduction", "description": "Rs 50 cut for a cancelled order"},
+        headers=h,
+    )
+    assert res.status_code == 201, res.text
+    body = res.json()
+    assert body["kind"] == "payout_deduction"
+    assert "[stub]" in body["draft_local"]
+    assert body["draft_english"]
+
+    res = await client.get("/grievances", headers=h)
+    assert res.status_code == 200
+    assert [g["id"] for g in res.json()] == [body["id"]]
+
+
+async def test_data_is_isolated_per_worker(client: AsyncClient, worker: dict) -> None:
+    other = await client.post(
+        "/auth/register",
+        json={"phone": "7222222222", "pin": "1111", "name": "Other", "language": "en"},
+    )
+    assert other.status_code == 201
+    oh = {"Authorization": f"Bearer {other.json()['token']}"}
+    await client.post("/earnings", json={"amount": 100}, headers=worker["headers"])
+    res = await client.get("/earnings", headers=oh)
+    assert res.json()["entries"] == []

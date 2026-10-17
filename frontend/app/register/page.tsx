@@ -2,11 +2,21 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
+import GoogleButton from "@/components/GoogleButton";
 import { applyLang } from "@/components/LangSync";
 import MicButton from "@/components/MicButton";
 import { Button, Card, ChipGroup, ErrorText, Input, Label, Select, Textarea } from "@/components/ui";
-import { api, getLang, setLang, setToken, type AuthResponse, type OnboardingParse } from "@/lib/api";
+import {
+  api,
+  getLang,
+  getToken,
+  setLang,
+  setToken,
+  type AuthResponse,
+  type OnboardingParse,
+  type User,
+} from "@/lib/api";
 import { isSupportedLang, LANGUAGES, PLATFORMS, WORK_TYPES, t } from "@/lib/i18n";
 
 type Step = 1 | 2 | 3;
@@ -41,7 +51,39 @@ export default function RegisterPage() {
   const [login, setLogin] = useState({ phone: "", pin: "", pin2: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  // Google sign-in lands here with ?step=2 and a token already stored: the profile is
+  // saved with PUT /me instead of creating a phone + PIN login.
+  const [googleMode, setGoogleMode] = useState(false);
   const s = t(lang);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("step") !== "2") return;
+    // Deferred so the prerendered step-1 markup hydrates before we switch steps.
+    const id = window.setTimeout(() => {
+      setStep(2);
+      if (getToken()) setGoogleMode(true);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, []);
+
+  async function saveProfileForSignedInUser() {
+    await api.put<User>("/me", {
+      name: profile.name.trim() || undefined,
+      language: profile.language,
+      work_types: profile.work_types,
+      platforms: profile.platforms,
+      city: profile.city.trim(),
+      memory: profile.memory || undefined,
+    });
+    switchLang(profile.language);
+    router.push("/home");
+  }
+
+  async function onGoogleAtStep3(res: AuthResponse) {
+    setToken(res.token);
+    await saveProfileForSignedInUser();
+  }
 
   function switchLang(code: string) {
     setLang(code);
@@ -99,6 +141,14 @@ export default function RegisterPage() {
       return;
     }
     setError("");
+    if (googleMode) {
+      setBusy(true);
+      saveProfileForSignedInUser().catch((err) => {
+        setError(err instanceof Error ? err.message : "Could not save profile");
+        setBusy(false);
+      });
+      return;
+    }
     setStep(3);
   }
 
@@ -295,6 +345,20 @@ export default function RegisterPage() {
                 {busy ? s.loading : s.createAccount}
               </Button>
             </div>
+            {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-3 text-xs uppercase text-zinc-500">
+                  <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+                  {s.or}
+                  <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+                </div>
+                <GoogleButton
+                  label={s.continueWithGoogle}
+                  onSignedIn={onGoogleAtStep3}
+                  onError={setError}
+                />
+              </div>
+            )}
           </form>
         )}
 

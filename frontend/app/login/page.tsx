@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
+import GoogleButton from "@/components/GoogleButton";
 import { applyLang } from "@/components/LangSync";
 import { api, getLang, setLang, setToken, type AuthResponse } from "@/lib/api";
 import { t } from "@/lib/i18n";
@@ -15,6 +16,14 @@ export default function LoginPage() {
   const [pin, setPin] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  function onGoogle(res: AuthResponse) {
+    setToken(res.token);
+    setLang(res.user.language);
+    applyLang(res.user.language);
+    const needsProfile = res.is_new || res.user.platforms.length === 0;
+    router.push(needsProfile ? "/register?step=2" : "/home");
+  }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
@@ -70,6 +79,16 @@ export default function LoginPage() {
             {busy ? s.loading : s.login}
           </Button>
         </form>
+        {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID && (
+          <div className="mt-4 space-y-3">
+            <div className="flex items-center gap-3 text-xs uppercase text-zinc-500">
+              <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+              {s.or}
+              <span className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+            </div>
+            <GoogleButton label={s.continueWithGoogle} onSignedIn={onGoogle} onError={setError} />
+          </div>
+        )}
         <p className="mt-4 text-center text-sm">
           {s.noAccount}{" "}
           <Link href="/register" className="font-semibold text-emerald-700 underline dark:text-emerald-400">
