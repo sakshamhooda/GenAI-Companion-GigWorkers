@@ -222,3 +222,17 @@ __marimo__/
 # Claude Code context (local only)
 CLAUDE.md
 plans/
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env.local
+.env.*.local
+npm-debug.log*
+.vercel
+
+# macOS
+.DS_Store
