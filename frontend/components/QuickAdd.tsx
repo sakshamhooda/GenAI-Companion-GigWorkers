@@ -32,7 +32,8 @@ export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
     setBusy(true);
     setError("");
     try {
-      await api.post<Earning>("/earnings", parsed);
+      const { platform, ...rest } = parsed;
+      await api.post<Earning>("/earnings", platform ? { ...rest, platform } : rest);
       setParsed(null);
       setText("");
       onAdded();
@@ -89,8 +90,8 @@ export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
               <Label htmlFor="qa-platform">{s.platform}</Label>
               <Input
                 id="qa-platform"
-                value={parsed.platform}
-                onChange={(e) => setParsed({ ...parsed, platform: e.target.value })}
+                value={parsed.platform ?? ""}
+                onChange={(e) => setParsed({ ...parsed, platform: e.target.value || null })}
               />
             </div>
             <div>

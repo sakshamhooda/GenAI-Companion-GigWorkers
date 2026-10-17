@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { api, setLang, setToken, type AuthResponse } from "@/lib/api";
-import { LANGUAGES, PLATFORMS, t } from "@/lib/i18n";
-import { Button, Card, ErrorText, Input, Label, Select } from "@/components/ui";
+import { applyLang } from "@/components/LangSync";
+import { Button, Card, ChipGroup, ErrorText, Input, Label, Select } from "@/components/ui";
+import { api, getLang, setLang, setToken, type AuthResponse } from "@/lib/api";
+import { LANGUAGES, PLATFORMS, WORK_TYPES, t } from "@/lib/i18n";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -13,26 +14,37 @@ export default function RegisterPage() {
     name: "",
     phone: "",
     pin: "",
-    language: "hi",
-    work_type: "delivery",
-    platform: "",
+    language: getLang(),
+    work_types: ["delivery"] as string[],
+    platforms: [] as string[],
     city: "",
   });
   const s = t(form.language);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const set = (key: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+  const set = (key: "name" | "city") => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm({ ...form, [key]: e.target.value });
+
+  function chooseLang(code: string) {
+    setLang(code);
+    applyLang(code);
+    setForm({ ...form, language: code });
+  }
 
   async function submit(e: FormEvent) {
     e.preventDefault();
+    if (form.work_types.length === 0 || form.platforms.length === 0) {
+      setError(`${s.workType} / ${s.platform}`);
+      return;
+    }
     setBusy(true);
     setError("");
     try {
       const res = await api.post<AuthResponse>("/auth/register", form);
       setToken(res.token);
       setLang(res.user.language);
+      applyLang(res.user.language);
       router.push("/home");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
@@ -49,10 +61,10 @@ export default function RegisterPage() {
         <form onSubmit={submit} className="space-y-4">
           <div>
             <Label htmlFor="language">{s.language}</Label>
-            <Select id="language" value={form.language} onChange={set("language")}>
+            <Select id="language" value={form.language} onChange={(e) => chooseLang(e.target.value)}>
               {LANGUAGES.map((l) => (
                 <option key={l.code} value={l.code}>
-                  {l.label}
+                  {l.native}
                 </option>
               ))}
             </Select>
@@ -87,25 +99,22 @@ export default function RegisterPage() {
               onChange={(e) => setForm({ ...form, pin: e.target.value.replace(/\D/g, "") })}
             />
           </div>
-          <div>
-            <Label htmlFor="work_type">{s.workType}</Label>
-            <Select id="work_type" value={form.work_type} onChange={set("work_type")}>
-              {Object.entries(s.workTypes).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v}
-                </option>
-              ))}
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="platform">{s.platform}</Label>
-            <Input id="platform" list="platforms" required value={form.platform} onChange={set("platform")} />
-            <datalist id="platforms">
-              {PLATFORMS.map((p) => (
-                <option key={p} value={p} />
-              ))}
-            </datalist>
-          </div>
+          <ChipGroup
+            id="work_types"
+            label={s.workType}
+            options={WORK_TYPES.map((w) => ({ value: w, label: s.workTypes[w] }))}
+            value={form.work_types}
+            onChange={(work_types) => setForm({ ...form, work_types })}
+          />
+          <ChipGroup
+            id="platforms"
+            label={s.platform}
+            options={PLATFORMS.map((p) => ({ value: p, label: p }))}
+            value={form.platforms}
+            onChange={(platforms) => setForm({ ...form, platforms })}
+            addLabel={s.addPlatform}
+            addPlaceholder={s.addPlatformPlaceholder}
+          />
           <div>
             <Label htmlFor="city">{s.city}</Label>
             <Input id="city" required autoComplete="address-level2" value={form.city} onChange={set("city")} />

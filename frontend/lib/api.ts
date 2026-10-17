@@ -1,3 +1,5 @@
+import { DEFAULT_LANG, isSupportedLang } from "@/lib/i18n";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const TOKEN_KEY = "saathi_token";
 const LANG_KEY = "saathi_lang";
@@ -7,10 +9,11 @@ export type User = {
   phone: string;
   name: string;
   language: string;
-  work_type: string;
-  platform: string;
+  work_types: string[];
+  platforms: string[];
   city: string;
   memory: string | null;
+  role?: string;
 };
 
 export type AuthResponse = { token: string; user: User };
@@ -34,7 +37,7 @@ export type EarningsSummary = {
 export type ParsedEarning = {
   amount: number;
   expenses: number;
-  platform: string;
+  platform: string | null;
   date: string;
   note: string | null;
 };
@@ -78,7 +81,10 @@ export const clearToken = () => {
   safeSet(TOKEN_KEY, null);
   safeSet(LANG_KEY, null);
 };
-export const getLang = () => safeGet(LANG_KEY) ?? "hi";
+export const getLang = () => {
+  const stored = safeGet(LANG_KEY);
+  return isSupportedLang(stored) ? stored : DEFAULT_LANG;
+};
 export const setLang = (l: string) => safeSet(LANG_KEY, l);
 
 export class ApiError extends Error {
@@ -89,7 +95,7 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(method: "GET" | "POST", path: string, body?: unknown): Promise<T> {
+async function request<T>(method: "GET" | "POST" | "PUT", path: string, body?: unknown): Promise<T> {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -117,4 +123,5 @@ async function request<T>(method: "GET" | "POST", path: string, body?: unknown):
 export const api = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
+  put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
 };

@@ -1,24 +1,60 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import AppShell from "@/components/AppShell";
-import { Button, Card } from "@/components/ui";
-import { api, clearToken, getLang, type User } from "@/lib/api";
-import { t } from "@/lib/i18n";
+import { applyLang } from "@/components/LangSync";
+import { Button, Card, ChipGroup, ErrorText, Input, Label, Select } from "@/components/ui";
+import { api, clearToken, getLang, setLang, type User } from "@/lib/api";
+import { LANGUAGES, PLATFORMS, WORK_TYPES, t } from "@/lib/i18n";
+
+type Editable = Pick<User, "name" | "language" | "work_types" | "platforms" | "city">;
 
 export default function ProfilePage() {
   const router = useRouter();
-  const lang = getLang();
+  const [lang, setLangState] = useState(getLang);
   const s = t(lang);
   const [user, setUser] = useState<User | null>(null);
+  const [form, setForm] = useState<Editable | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     api
       .get<User>("/me")
-      .then(setUser)
+      .then((u) => {
+        setUser(u);
+        setForm({
+          name: u.name,
+          language: u.language,
+          work_types: u.work_types ?? [],
+          platforms: u.platforms ?? [],
+          city: u.city,
+        });
+      })
       .catch(() => {});
   }, []);
+
+  async function save(e: FormEvent) {
+    e.preventDefault();
+    if (!form) return;
+    setBusy(true);
+    setError("");
+    setSaved(false);
+    try {
+      const u = await api.put<User>("/me", form);
+      setUser(u);
+      setLang(u.language);
+      applyLang(u.language);
+      setLangState(u.language);
+      setSaved(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   function logout() {
     clearToken();
@@ -29,25 +65,57 @@ export default function ProfilePage() {
     <AppShell title={s.profile}>
       <div className="space-y-4">
         <Card>
-          {!user ? (
+          {!form ? (
             <p>{s.loading}</p>
           ) : (
-            <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.name}</dt>
-              <dd className="font-medium">{user.name}</dd>
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.phone}</dt>
-              <dd className="font-medium">{user.phone}</dd>
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.workType}</dt>
-              <dd className="font-medium">
-                {s.workTypes[user.work_type as keyof typeof s.workTypes] ?? user.work_type}
-              </dd>
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.platform}</dt>
-              <dd className="font-medium">{user.platform}</dd>
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.city}</dt>
-              <dd className="font-medium">{user.city}</dd>
-              <dt className="text-zinc-600 dark:text-zinc-300">{s.language}</dt>
-              <dd className="font-medium">{user.language}</dd>
-            </dl>
+            <form onSubmit={save} className="space-y-4">
+              <div>
+                <Label htmlFor="p-name">{s.name}</Label>
+                <Input id="p-name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+              </div>
+              <div>
+                <Label htmlFor="p-phone">{s.phone}</Label>
+                <Input id="p-phone" readOnly value={user?.phone ?? ""} />
+              </div>
+              <div>
+                <Label htmlFor="p-language">{s.language}</Label>
+                <Select
+                  id="p-language"
+                  value={form.language}
+                  onChange={(e) => setForm({ ...form, language: e.target.value })}
+                >
+                  {LANGUAGES.map((l) => (
+                    <option key={l.code} value={l.code}>
+                      {l.native}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+              <ChipGroup
+                id="p-work_types"
+                label={s.workType}
+                options={WORK_TYPES.map((w) => ({ value: w, label: s.workTypes[w] }))}
+                value={form.work_types}
+                onChange={(work_types) => setForm({ ...form, work_types })}
+              />
+              <ChipGroup
+                id="p-platforms"
+                label={s.platform}
+                options={PLATFORMS.map((p) => ({ value: p, label: p }))}
+                value={form.platforms}
+                onChange={(platforms) => setForm({ ...form, platforms })}
+                addLabel={s.addPlatform}
+                addPlaceholder={s.addPlatformPlaceholder}
+              />
+              <div>
+                <Label htmlFor="p-city">{s.city}</Label>
+                <Input id="p-city" required value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+              </div>
+              <ErrorText>{error}</ErrorText>
+              <Button type="submit" className="w-full" disabled={busy}>
+                {busy ? s.loading : saved ? s.saved : s.save}
+              </Button>
+            </form>
           )}
         </Card>
 
