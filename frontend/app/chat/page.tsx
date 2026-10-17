@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import AppShell from "@/components/AppShell";
+import MicButton from "@/components/MicButton";
 import { Button, ErrorText, Input } from "@/components/ui";
 import { api, getLang, type ChatMessage } from "@/lib/api";
 import { t } from "@/lib/i18n";
@@ -97,6 +98,7 @@ export default function ChatPage() {
               placeholder={s.typeMessage}
               autoComplete="off"
             />
+            <MicButton onTranscript={(txt) => setInput((cur) => (cur.trim() ? `${cur.trim()} ${txt}` : txt))} />
             <Button type="submit" disabled={busy || !input.trim()}>
               {s.send}
             </Button>

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { api, getLang, type Earning, type ParsedEarning } from "@/lib/api";
 import { t } from "@/lib/i18n";
+import MicButton from "@/components/MicButton";
 import { Button, Card, ErrorText, Input, Label } from "@/components/ui";
 
 export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
@@ -57,6 +58,7 @@ export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
               placeholder={s.quickAddPlaceholder}
               autoComplete="off"
             />
+            <MicButton onTranscript={(txt) => setText(txt)} />
             <Button type="submit" disabled={busy || !text.trim()}>
               {busy ? "…" : s.parse}
             </Button>

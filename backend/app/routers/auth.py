@@ -30,6 +30,7 @@ async def register(body: RegisterIn, session: AsyncSession = Depends(get_session
         work_type=join_csv(body.all_work_types()),
         platform=join_csv(body.all_platforms()),
         city=body.city,
+        memory=body.initial_memory(),
     )
     session.add(user)
     await session.commit()

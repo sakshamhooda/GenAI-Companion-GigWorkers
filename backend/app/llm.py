@@ -49,6 +49,20 @@ def generate(prompt: str, system: str | None = None) -> str:
         return "Sorry, I am having trouble right now. Please try again in a moment."
 
 
+def _parse_json(text: str | None) -> dict:
+    """Parse model output as a JSON object, tolerating ```json fences."""
+    raw = (text or "").strip()
+    if raw.startswith("```"):
+        raw = raw.strip("`")
+        if raw.lower().startswith("json"):
+            raw = raw[4:]
+    try:
+        data = json.loads(raw or "{}")
+    except json.JSONDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def extract_json(prompt: str, system: str | None = None, stub: dict | None = None) -> dict:
     """Ask the model for JSON and parse it. Returns `stub` (or {}) on failure or without a key."""
     client = _get_client()
@@ -58,8 +72,24 @@ def extract_json(prompt: str, system: str | None = None, stub: dict | None = Non
         res = client.models.generate_content(
             model=settings.gemini_model, contents=prompt, config=_config(system, True)
         )
-        data = json.loads(res.text or "{}")
-        return data if isinstance(data, dict) else {}
+        return _parse_json(res.text)
     except Exception as exc:  # noqa: BLE001
         log.warning("gemini extract_json failed: %s", exc)
         return dict(stub) if stub is not None else {}
+
+
+def extract_json_multimodal(
+    prompt: str, data: bytes, mime_type: str, system: str | None = None
+) -> dict:
+    """Same as extract_json but with an inline audio/image part. Raises on failure."""
+    client = _get_client()
+    if client is None:
+        raise RuntimeError("gemini not configured")
+    from google.genai import types
+
+    res = client.models.generate_content(
+        model=settings.gemini_model,
+        contents=[types.Part.from_bytes(data=data, mime_type=mime_type), prompt],
+        config=_config(system, True),
+    )
+    return _parse_json(res.text)
