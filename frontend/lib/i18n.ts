@@ -1339,7 +1339,26 @@ const onboarding: Record<string, OnboardingStrings> = {
   },
 };
 
-export type Strings = Base & OnboardingStrings;
+// Sign-in alternatives. Falls back to English for languages without an entry.
+const authEn = { continueWithGoogle: "Continue with Google", or: "or" };
+type AuthStrings = typeof authEn;
+const authStrings: Record<string, AuthStrings> = {
+  en: authEn,
+  hi: { continueWithGoogle: "Google से जारी रखें", or: "या" },
+  bn: { continueWithGoogle: "Google দিয়ে চালিয়ে যান", or: "অথবা" },
+  gu: { continueWithGoogle: "Google સાથે ચાલુ રાખો", or: "અથવા" },
+  kn: { continueWithGoogle: "Google ಮೂಲಕ ಮುಂದುವರಿಸಿ", or: "ಅಥವಾ" },
+  ml: { continueWithGoogle: "Google ഉപയോഗിച്ച് തുടരുക", or: "അല്ലെങ്കിൽ" },
+  mr: { continueWithGoogle: "Google ने पुढे जा", or: "किंवा" },
+  od: { continueWithGoogle: "Google ସହିତ ଜାରି ରଖନ୍ତୁ", or: "କିମ୍ବା" },
+  pa: { continueWithGoogle: "Google ਨਾਲ ਜਾਰੀ ਰੱਖੋ", or: "ਜਾਂ" },
+  ta: { continueWithGoogle: "Google மூலம் தொடரவும்", or: "அல்லது" },
+  te: { continueWithGoogle: "Google తో కొనసాగించండి", or: "లేదా" },
+  as: { continueWithGoogle: "Google ৰ সৈতে আগবাঢ়ক", or: "বা" },
+  ur: { continueWithGoogle: "Google کے ساتھ جاری رکھیں", or: "یا" },
+};
+
+export type Strings = Base & OnboardingStrings & AuthStrings;
 
 export const DEFAULT_LANG = "hi";
 
@@ -1370,7 +1389,11 @@ export function isSupportedLang(code: string | null | undefined): code is string
 
 export function t(lang: string): Strings {
   const code = lang in strings ? lang : DEFAULT_LANG;
-  return { ...strings[code], ...(onboarding[code] ?? onboardingEn) };
+  return {
+    ...strings[code],
+    ...(onboarding[code] ?? onboardingEn),
+    ...(authStrings[code] ?? authEn),
+  };
 }
 
 export const WORK_TYPES = ["delivery", "driver", "home_services", "daily_wage", "other"] as const;

@@ -2,8 +2,9 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app import ratelimit
 from app.auth import get_current_user
-from app.context import build_context, system_prompt_for
+from app.context import build_context, system_prompt_for, worker_input
 from app.db import get_session
 from app.llm import extract_json
 from app.models import Grievance, User
@@ -24,7 +25,12 @@ Use placeholders like [ORDER ID] or [DATE] for details you do not have. No markd
 """
 
 
-@router.post("/draft", response_model=GrievanceOut, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/draft",
+    response_model=GrievanceOut,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(ratelimit.per_user("grievance-draft", 10))],
+)
 async def draft(
     body: GrievanceIn,
     user: User = Depends(get_current_user),
@@ -33,7 +39,7 @@ async def draft(
     earnings = await recent_earnings(session, user.id, 7)
     prompt = (
         f"{build_context(user, earnings)}\n\n"
-        f"COMPLAINT TYPE: {body.kind}\nWORKER'S DESCRIPTION: {body.description}"
+        f"COMPLAINT TYPE: {body.kind}\nWORKER'S DESCRIPTION: {worker_input(body.description)}"
     )
     stub = {
         "draft_local": f"[stub] {body.kind}: {body.description}",

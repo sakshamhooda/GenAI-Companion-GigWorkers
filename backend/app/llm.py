@@ -1,7 +1,17 @@
-"""Thin Gemini client. Runs in stub mode when no API key is configured."""
+"""Thin Gemini client.
+
+Behaviour:
+- No API key configured: every call returns deterministic stub output so the app
+  and its tests run offline.
+- Key configured: calls are retried on transient errors (429/503) with a short
+  backoff, then once more on a fallback model. If that also fails the call raises
+  ``LLMUnavailable``, which the API maps to HTTP 503. Stub output is never served
+  when a key is configured, so a worker never sees placeholder data by mistake.
+"""
 
 import json
 import logging
+import time
 from typing import Any
 
 from app.config import settings
@@ -11,10 +21,22 @@ log = logging.getLogger(__name__)
 STUB_TEXT = "[stub] Saathi is running without an LLM key. This is a placeholder reply."
 STUB_JSON: dict[str, Any] = {"stub": True}
 
-_client = None
+FALLBACK_MODEL = "gemini-3.5-flash"
+_RETRY_DELAYS = (0.5, 1.5)
+_TRANSIENT_MARKERS = ("503", "UNAVAILABLE", "429", "RESOURCE_EXHAUSTED", "overloaded", "timeout")
+
+_client: Any = None
 
 
-def _get_client():
+class LLMUnavailable(RuntimeError):
+    """Raised when the model cannot answer after retries and the fallback model."""
+
+
+def _get_client() -> Any:
+    """Return a process-wide Gemini client, or None when no key is configured.
+
+    The SDK is imported lazily so the app (and its tests) start without it.
+    """
     global _client
     if _client is None and settings.gemini_api_key:
         from google import genai
@@ -23,7 +45,8 @@ def _get_client():
     return _client
 
 
-def _config(system: str | None, json_mode: bool):
+def _config(system: str | None, json_mode: bool) -> Any:
+    """Build the generation config: no thinking budget (latency), low temperature."""
     from google.genai import types
 
     return types.GenerateContentConfig(
@@ -34,19 +57,43 @@ def _config(system: str | None, json_mode: bool):
     )
 
 
+def _is_transient(exc: Exception) -> bool:
+    text = str(exc)
+    return any(marker in text for marker in _TRANSIENT_MARKERS)
+
+
+def _generate_with_retry(client: Any, contents: Any, system: str | None, json_mode: bool) -> str:
+    """Call the primary model with retries, then the fallback model once."""
+    attempts: list[tuple[str, float | None]] = [
+        (settings.gemini_model, _RETRY_DELAYS[0]),
+        (settings.gemini_model, _RETRY_DELAYS[1]),
+        (settings.gemini_model, None),
+        (FALLBACK_MODEL, None),
+    ]
+    last_exc: Exception | None = None
+    for model, delay in attempts:
+        try:
+            res = client.models.generate_content(
+                model=model, contents=contents, config=_config(system, json_mode)
+            )
+            return (res.text or "").strip()
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            log.warning("gemini call failed (model=%s): %s", model, exc)
+            if not _is_transient(exc):
+                break
+            if delay:
+                time.sleep(delay)
+    raise LLMUnavailable("model unavailable") from last_exc
+
+
 def generate(prompt: str, system: str | None = None) -> str:
-    """Return plain text from the model, or a safe fallback."""
+    """Return plain text from the model. Raises ``LLMUnavailable`` when the model is down."""
     client = _get_client()
     if client is None:
         return STUB_TEXT
-    try:
-        res = client.models.generate_content(
-            model=settings.gemini_model, contents=prompt, config=_config(system, False)
-        )
-        return (res.text or "").strip() or "Sorry, I could not generate a reply. Please try again."
-    except Exception as exc:  # noqa: BLE001
-        log.warning("gemini generate failed: %s", exc)
-        return "Sorry, I am having trouble right now. Please try again in a moment."
+    text = _generate_with_retry(client, prompt, system, json_mode=False)
+    return text or "Sorry, I could not generate a reply. Please try again."
 
 
 def _parse_json(text: str | None) -> dict:
@@ -64,32 +111,25 @@ def _parse_json(text: str | None) -> dict:
 
 
 def extract_json(prompt: str, system: str | None = None, stub: dict | None = None) -> dict:
-    """Ask the model for JSON and parse it. Returns `stub` (or {}) on failure or without a key."""
+    """Ask the model for a JSON object and parse it.
+
+    Without a key returns ``stub`` (or a marker dict). With a key, raises
+    ``LLMUnavailable`` if the model is down; returns ``{}`` if the output is not JSON.
+    """
     client = _get_client()
     if client is None:
         return dict(stub) if stub is not None else dict(STUB_JSON)
-    try:
-        res = client.models.generate_content(
-            model=settings.gemini_model, contents=prompt, config=_config(system, True)
-        )
-        return _parse_json(res.text)
-    except Exception as exc:  # noqa: BLE001
-        log.warning("gemini extract_json failed: %s", exc)
-        return dict(stub) if stub is not None else {}
+    return _parse_json(_generate_with_retry(client, prompt, system, json_mode=True))
 
 
 def extract_json_multimodal(
     prompt: str, data: bytes, mime_type: str, system: str | None = None
 ) -> dict:
-    """Same as extract_json but with an inline audio/image part. Raises on failure."""
+    """Same as ``extract_json`` but with an inline audio/image part. Raises on failure."""
     client = _get_client()
     if client is None:
         raise RuntimeError("gemini not configured")
     from google.genai import types
 
-    res = client.models.generate_content(
-        model=settings.gemini_model,
-        contents=[types.Part.from_bytes(data=data, mime_type=mime_type), prompt],
-        config=_config(system, True),
-    )
-    return _parse_json(res.text)
+    contents = [types.Part.from_bytes(data=data, mime_type=mime_type), prompt]
+    return _parse_json(_generate_with_retry(client, contents, system, json_mode=True))

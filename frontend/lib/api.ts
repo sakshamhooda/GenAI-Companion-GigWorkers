@@ -6,7 +6,8 @@ const LANG_KEY = "saathi_lang";
 
 export type User = {
   id: number;
-  phone: string;
+  phone: string | null;
+  email?: string | null;
   name: string;
   language: string;
   work_types: string[];
@@ -16,7 +17,7 @@ export type User = {
   role?: string;
 };
 
-export type AuthResponse = { token: string; user: User };
+export type AuthResponse = { token: string; user: User; is_new?: boolean };
 
 export type Earning = {
   id: number;

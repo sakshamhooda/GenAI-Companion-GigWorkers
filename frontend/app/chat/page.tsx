@@ -7,6 +7,7 @@ import { Button, ErrorText, Input } from "@/components/ui";
 import { api, getLang, type ChatMessage } from "@/lib/api";
 import { t } from "@/lib/i18n";
 
+/** Chat with Saathi: history, text or voice input, quick chips for safety, schemes and documents. */
 export default function ChatPage() {
   const lang = getLang();
   const s = t(lang);

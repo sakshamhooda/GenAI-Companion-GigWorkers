@@ -11,6 +11,7 @@ export function applyLang(code: string) {
   document.documentElement.dir = RTL_LANGS.includes(code) ? "rtl" : "ltr";
 }
 
+/** Mounted once in the root layout; applies the stored language to the document on load. */
 export default function LangSync() {
   useEffect(() => {
     applyLang(getLang());

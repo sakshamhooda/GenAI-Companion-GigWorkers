@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 
+/** Surface for grouped content. */
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <section className={`rounded-2xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 ${className}`}>
@@ -10,6 +11,7 @@ export function Card({ children, className = "" }: { children: ReactNode; classN
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primary" | "secondary" };
 
+/** 44px-tall button; `variant` picks primary or secondary styling. */
 export function Button({ variant = "primary", className = "", ...props }: ButtonProps) {
   const base =
     "min-h-11 rounded-xl px-4 text-base font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 disabled:opacity-50";
@@ -23,6 +25,7 @@ export function Button({ variant = "primary", className = "", ...props }: Button
 const fieldClass =
   "min-h-11 w-full rounded-xl border border-zinc-300 bg-white px-3 text-base text-zinc-900 focus:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-200 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100";
 
+/** Visible form label; always pair with an input `id`. */
 export function Label({ htmlFor, children }: { htmlFor: string; children: ReactNode }) {
   return (
     <label htmlFor={htmlFor} className="mb-1 block text-sm font-medium text-zinc-800 dark:text-zinc-200">
@@ -43,6 +46,7 @@ export function Textarea({ className = "", ...props }: TextareaHTMLAttributes<HT
   return <textarea className={`${fieldClass} min-h-28 py-2 ${className}`} {...props} />;
 }
 
+/** Inline error message announced to screen readers via role="alert". */
 export function ErrorText({ children }: { children: ReactNode }) {
   if (!children) return null;
   return (

@@ -10,6 +10,7 @@ import { t } from "@/lib/i18n";
 
 const inr = (n: number) => `₹${Math.round(n).toLocaleString("en-IN")}`;
 
+/** Home: greeting, this week's earnings summary, quick-add, and shortcuts to chat and help. */
 export default function HomePage() {
   const s = t(getLang());
   const [user, setUser] = useState<User | null>(null);

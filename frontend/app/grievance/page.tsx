@@ -38,6 +38,7 @@ function DraftCard({ title, text, lang, copyLabel, copiedLabel }: {
   );
 }
 
+/** Help: draft a grievance in the worker's language and formal English, copy it, see past drafts. */
 export default function GrievancePage() {
   const lang = getLang();
   const s = t(lang);

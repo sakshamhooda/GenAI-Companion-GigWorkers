@@ -25,6 +25,10 @@ _DEMO_EARNINGS = [
 
 
 async def seed_demo() -> None:
+    """Create the demo worker and a week of earnings; on re-runs only refresh the profile lists.
+
+    Safe to call on every startup. Does nothing when no database is configured.
+    """
     if get_engine() is None:
         return
     async with get_sessionmaker()() as session:

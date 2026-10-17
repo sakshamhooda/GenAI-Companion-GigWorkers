@@ -6,6 +6,10 @@ import { t } from "@/lib/i18n";
 import MicButton from "@/components/MicButton";
 import { Button, Card, ErrorText, Input, Label } from "@/components/ui";
 
+/**
+ * Natural-language earnings entry. Text or voice ("aaj 850 kamaye, 120 petrol") is parsed by
+ * the backend, shown in an editable mini-form, and saved on confirm. Calls `onAdded` after save.
+ */
 export default function QuickAdd({ onAdded }: { onAdded: () => void }) {
   const s = t(getLang());
   const [text, setText] = useState("");

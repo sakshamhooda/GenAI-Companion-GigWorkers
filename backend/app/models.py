@@ -1,6 +1,8 @@
+"""ORM models. Keep in sync with `alembic/versions`; migrations are the source of truth."""
+
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Date, DateTime, Float, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db import Base
@@ -10,8 +12,12 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    phone: Mapped[str] = mapped_column(String(20), unique=True, index=True)
+    # Phone + PIN login. Nullable because Google sign-in users may not have set one.
+    phone: Mapped[str | None] = mapped_column(String(20), unique=True, index=True, nullable=True)
     pin_hash: Mapped[str] = mapped_column(String(255))
+    # Google sign-in (migration 0003).
+    google_sub: Mapped[str | None] = mapped_column(String(64), unique=True, nullable=True)
+    email: Mapped[str | None] = mapped_column(String(255), index=True, nullable=True)
     name: Mapped[str] = mapped_column(String(100), default="")
     language: Mapped[str] = mapped_column(String(10), default="hi")
     # Comma-separated lists; see app.util.split_csv / join_csv.
@@ -25,6 +31,7 @@ class User(Base):
 
 class Earning(Base):
     __tablename__ = "earnings"
+    __table_args__ = (Index("ix_earnings_user_date", "user_id", "date"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
@@ -38,6 +45,7 @@ class Earning(Base):
 
 class Message(Base):
     __tablename__ = "messages"
+    __table_args__ = (Index("ix_messages_user_created", "user_id", "created_at"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
@@ -49,6 +57,7 @@ class Message(Base):
 
 class Grievance(Base):
     __tablename__ = "grievances"
+    __table_args__ = (Index("ix_grievances_user_created", "user_id", "created_at"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)

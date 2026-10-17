@@ -16,9 +16,12 @@ COPY backend/pyproject.toml backend/uv.lock* ./
 RUN uv sync --frozen --no-dev --no-install-project || uv sync --no-dev --no-install-project
 
 COPY backend/app ./app
+COPY backend/alembic.ini ./alembic.ini
+COPY backend/alembic ./alembic
 
 RUN useradd --create-home appuser && chown -R appuser /app
 USER appuser
 
 EXPOSE 8000
-CMD ["sh", "-c", "/app/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]
+# Migrate first; if the migration fails the container exits and never serves traffic.
+CMD ["sh", "-c", "/app/.venv/bin/alembic upgrade head && /app/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port ${PORT}"]

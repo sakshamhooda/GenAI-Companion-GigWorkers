@@ -10,6 +10,7 @@ import { LANGUAGES, PLATFORMS, WORK_TYPES, t } from "@/lib/i18n";
 
 type Editable = Pick<User, "name" | "language" | "work_types" | "platforms" | "city">;
 
+/** Profile: editable name, language, work types, platforms, city; memory note; WhatsApp (coming soon); logout. */
 export default function ProfilePage() {
   const router = useRouter();
   const [lang, setLangState] = useState(getLang);

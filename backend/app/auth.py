@@ -1,3 +1,5 @@
+"""PIN hashing, signed session tokens and the current-user dependency."""
+
 import hashlib
 import hmac
 import secrets
@@ -12,22 +14,38 @@ from app.db import get_session
 from app.models import User
 
 _serializer = URLSafeTimedSerializer(settings.secret_key, salt="auth-token")
-TOKEN_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
-_ITERATIONS = 100_000
+
+# Current scheme: "pbkdf2$<iterations>$<salt>$<hex digest>".
+# Legacy scheme (first deploy): "<salt>$<hex digest>" with 100k iterations; still verified.
+_ITERATIONS = 600_000
+_LEGACY_ITERATIONS = 100_000
+
+
+def _digest(pin: str, salt: str, iterations: int) -> str:
+    return hashlib.pbkdf2_hmac("sha256", pin.encode(), salt.encode(), iterations).hex()
 
 
 def hash_pin(pin: str) -> str:
     salt = secrets.token_hex(16)
-    digest = hashlib.pbkdf2_hmac("sha256", pin.encode(), salt.encode(), _ITERATIONS).hex()
-    return f"{salt}${digest}"
+    return f"pbkdf2${_ITERATIONS}${salt}${_digest(pin, salt, _ITERATIONS)}"
 
 
 def verify_pin(pin: str, pin_hash: str) -> bool:
+    """Constant-time check of `pin` against a stored hash in either scheme."""
+    if not pin_hash:
+        return False
+    parts = pin_hash.split("$")
     try:
-        salt, digest = pin_hash.split("$", 1)
+        if len(parts) == 4 and parts[0] == "pbkdf2":
+            _, iterations, salt, digest = parts
+            candidate = _digest(pin, salt, int(iterations))
+        elif len(parts) == 2:
+            salt, digest = parts
+            candidate = _digest(pin, salt, _LEGACY_ITERATIONS)
+        else:
+            return False
     except ValueError:
         return False
-    candidate = hashlib.pbkdf2_hmac("sha256", pin.encode(), salt.encode(), _ITERATIONS).hex()
     return hmac.compare_digest(candidate, digest)
 
 
@@ -36,8 +54,9 @@ def create_token(user_id: int) -> str:
 
 
 def decode_token(token: str) -> int | None:
+    """Return the user id in a valid, unexpired token, else None."""
     try:
-        data = _serializer.loads(token, max_age=TOKEN_MAX_AGE)
+        data = _serializer.loads(token, max_age=settings.token_ttl_seconds)
     except (BadSignature, SignatureExpired):
         return None
     uid = data.get("uid") if isinstance(data, dict) else None
