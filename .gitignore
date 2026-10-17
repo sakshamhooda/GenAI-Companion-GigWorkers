@@ -236,3 +236,6 @@ npm-debug.log*
 
 # macOS
 .DS_Store
+
+# Re-include frontend source dirs shadowed by Python template rules
+!frontend/lib/
