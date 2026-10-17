@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.db import check_database, create_tables
-from app.routers import auth, chat, earnings, grievances
+from app.routers import auth, chat, earnings, grievances, onboarding, voice
 from app.seed import seed_demo
 
 log = logging.getLogger(__name__)
@@ -37,6 +37,8 @@ app.include_router(auth.router)
 app.include_router(earnings.router)
 app.include_router(chat.router)
 app.include_router(grievances.router)
+app.include_router(onboarding.router)
+app.include_router(voice.router)
 
 
 @app.get("/")

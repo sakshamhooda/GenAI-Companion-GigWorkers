@@ -48,6 +48,24 @@ export type ChatMessage = {
   created_at: string;
 };
 
+export type Transcript = {
+  transcript: string;
+  language_code: string | null;
+  language_probability: number | null;
+  provider: string;
+};
+
+export type OnboardingParse = {
+  name: string | null;
+  language: string | null;
+  work_types: string[];
+  platforms: string[];
+  city: string | null;
+  shift: string | null;
+  years_experience: number | null;
+  memory: string | null;
+};
+
 export type Grievance = {
   id: number;
   kind: string;
@@ -120,8 +138,27 @@ async function request<T>(method: "GET" | "POST" | "PUT", path: string, body?: u
   return (await res.json()) as T;
 }
 
+async function upload<T>(path: string, form: FormData): Promise<T> {
+  const headers: Record<string, string> = {};
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(`${BASE_URL}${path}`, { method: "POST", headers, body: form });
+  if (!res.ok) {
+    let message = `Upload failed (${res.status})`;
+    try {
+      const data = await res.json();
+      if (typeof data?.detail === "string") message = data.detail;
+    } catch {
+      /* no json body */
+    }
+    throw new ApiError(res.status, message);
+  }
+  return (await res.json()) as T;
+}
+
 export const api = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
   put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
+  upload,
 };

@@ -80,9 +80,9 @@ const en = {
   },
 };
 
-export type Strings = typeof en;
+type Base = typeof en;
 
-const hi: Strings = {
+const hi: Base = {
   appName: "साथी",
   greeting: "नमस्ते",
   pitch: "कमाई, अधिकार, सुरक्षा और शिकायत में आपका साथी। आपकी भाषा में।",
@@ -161,7 +161,7 @@ const hi: Strings = {
   },
 };
 
-const bn: Strings = {
+const bn: Base = {
   appName: "সাথী",
   greeting: "নমস্কার",
   pitch: "আয়, অধিকার, নিরাপত্তা ও অভিযোগে আপনার সাথী। আপনার ভাষায়।",
@@ -240,7 +240,7 @@ const bn: Strings = {
   },
 };
 
-const gu: Strings = {
+const gu: Base = {
   appName: "સાથી",
   greeting: "નમસ્તે",
   pitch: "કમાણી, હક, સલામતી અને ફરિયાદમાં તમારો સાથી. તમારી ભાષામાં.",
@@ -319,7 +319,7 @@ const gu: Strings = {
   },
 };
 
-const kn: Strings = {
+const kn: Base = {
   appName: "ಸಾಥಿ",
   greeting: "ನಮಸ್ಕಾರ",
   pitch: "ಆದಾಯ, ಹಕ್ಕು, ಸುರಕ್ಷತೆ ಮತ್ತು ದೂರಿನಲ್ಲಿ ನಿಮ್ಮ ಸಾಥಿ. ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ.",
@@ -398,7 +398,7 @@ const kn: Strings = {
   },
 };
 
-const ml: Strings = {
+const ml: Base = {
   appName: "സാഥി",
   greeting: "നമസ്കാരം",
   pitch: "വരുമാനം, അവകാശം, സുരക്ഷ, പരാതി എന്നിവയിൽ നിങ്ങളുടെ സാഥി. നിങ്ങളുടെ ഭാഷയിൽ.",
@@ -477,7 +477,7 @@ const ml: Strings = {
   },
 };
 
-const mr: Strings = {
+const mr: Base = {
   appName: "साथी",
   greeting: "नमस्कार",
   pitch: "कमाई, हक्क, सुरक्षा आणि तक्रारीत तुमचा साथी. तुमच्या भाषेत.",
@@ -556,7 +556,7 @@ const mr: Strings = {
   },
 };
 
-const od: Strings = {
+const od: Base = {
   appName: "ସାଥୀ",
   greeting: "ନମସ୍କାର",
   pitch: "ଆୟ, ଅଧିକାର, ସୁରକ୍ଷା ଓ ଅଭିଯୋଗରେ ଆପଣଙ୍କ ସାଥୀ। ଆପଣଙ୍କ ଭାଷାରେ।",
@@ -635,7 +635,7 @@ const od: Strings = {
   },
 };
 
-const pa: Strings = {
+const pa: Base = {
   appName: "ਸਾਥੀ",
   greeting: "ਸਤ ਸ੍ਰੀ ਅਕਾਲ",
   pitch: "ਕਮਾਈ, ਹੱਕ, ਸੁਰੱਖਿਆ ਅਤੇ ਸ਼ਿਕਾਇਤ ਵਿੱਚ ਤੁਹਾਡਾ ਸਾਥੀ। ਤੁਹਾਡੀ ਭਾਸ਼ਾ ਵਿੱਚ।",
@@ -714,7 +714,7 @@ const pa: Strings = {
   },
 };
 
-const ta: Strings = {
+const ta: Base = {
   appName: "சாத்தி",
   greeting: "வணக்கம்",
   pitch: "வருமானம், உரிமை, பாதுகாப்பு, புகாரில் உங்கள் சாத்தி. உங்கள் மொழியில்.",
@@ -793,7 +793,7 @@ const ta: Strings = {
   },
 };
 
-const te: Strings = {
+const te: Base = {
   appName: "సాథీ",
   greeting: "నమస్కారం",
   pitch: "ఆదాయం, హక్కులు, భద్రత, ఫిర్యాదుల్లో మీ సాథీ. మీ భాషలో.",
@@ -872,7 +872,7 @@ const te: Strings = {
   },
 };
 
-const as: Strings = {
+const as: Base = {
   appName: "সাথী",
   greeting: "নমস্কাৰ",
   pitch: "উপাৰ্জন, অধিকাৰ, সুৰক্ষা আৰু অভিযোগত আপোনাৰ সাথী। আপোনাৰ ভাষাত।",
@@ -951,7 +951,7 @@ const as: Strings = {
   },
 };
 
-const ur: Strings = {
+const ur: Base = {
   appName: "ساتھی",
   greeting: "السلام علیکم",
   pitch: "کمائی، حقوق، حفاظت اور شکایت میں آپ کا ساتھی۔ آپ کی زبان میں۔",
@@ -1030,7 +1030,316 @@ const ur: Strings = {
   },
 };
 
-const strings: Record<string, Strings> = { hi, en, bn, gu, kn, ml, mr, od, pa, ta, te, as, ur };
+const strings: Record<string, Base> = { hi, en, bn, gu, kn, ml, mr, od, pa, ta, te, as, ur };
+
+// Voice input and conversational onboarding strings, kept separate so each block stays short.
+const onboardingEn = {
+  speak: "Speak",
+  listening: "Listening… tap to stop",
+  stopRecording: "Stop recording",
+  transcribing: "Transcribing…",
+  micDenied: "Microphone permission denied.",
+  micUnsupported: "Voice input is not supported in this browser.",
+  step: "Step",
+  onboardTitle: "Tell Saathi about your work",
+  onboardHint: "Speak or type: which platforms, which city, what kind of work, since when.",
+  onboardExample: "I deliver for Zomato and Swiggy in Jaipur, night shifts, for 3 years",
+  next: "Next",
+  skipType: "Skip, I'll type it",
+  confirmTitle: "Did I get this right?",
+  looksRight: "Looks right",
+  willRemember: "Saathi will remember",
+  loginTitle: "Set up your login",
+  confirmPin: "Confirm PIN",
+  pinMismatch: "PINs don't match",
+  createAccount: "Create account",
+  back: "Back",
+  detectedLang: "Detected language",
+};
+
+type OnboardingStrings = typeof onboardingEn;
+
+const onboarding: Record<string, OnboardingStrings> = {
+  en: onboardingEn,
+  hi: {
+    speak: "बोलें",
+    listening: "सुन रहा हूँ… रोकने के लिए दबाएँ",
+    stopRecording: "रिकॉर्डिंग रोकें",
+    transcribing: "लिख रहा हूँ…",
+    micDenied: "माइक की अनुमति नहीं मिली।",
+    micUnsupported: "इस ब्राउज़र में आवाज़ से इनपुट नहीं चलता।",
+    step: "चरण",
+    onboardTitle: "साथी को अपने काम के बारे में बताएँ",
+    onboardHint: "बोलें या लिखें: कौन से प्लेटफ़ॉर्म, कौन सा शहर, किस तरह का काम, कब से।",
+    onboardExample: "मैं जयपुर में ज़ोमैटो और स्विगी के लिए रात को डिलीवरी करता हूँ, 3 साल से",
+    next: "आगे",
+    skipType: "छोड़ें, मैं खुद लिखूँगा",
+    confirmTitle: "क्या मैंने सही समझा?",
+    looksRight: "सही है",
+    willRemember: "साथी याद रखेगा",
+    loginTitle: "अपना लॉगिन बनाएँ",
+    confirmPin: "PIN दोबारा डालें",
+    pinMismatch: "दोनों PIN एक जैसे नहीं हैं",
+    createAccount: "खाता बनाएँ",
+    back: "पीछे",
+    detectedLang: "पहचानी गई भाषा",
+  },
+  bn: {
+    speak: "বলুন",
+    listening: "শুনছি… থামাতে চাপুন",
+    stopRecording: "রেকর্ডিং বন্ধ করুন",
+    transcribing: "লিখছি…",
+    micDenied: "মাইকের অনুমতি পাওয়া যায়নি।",
+    micUnsupported: "এই ব্রাউজারে ভয়েস ইনপুট চলে না।",
+    step: "ধাপ",
+    onboardTitle: "সাথীকে আপনার কাজের কথা বলুন",
+    onboardHint: "বলুন বা লিখুন: কোন প্ল্যাটফর্ম, কোন শহর, কী ধরনের কাজ, কবে থেকে।",
+    onboardExample: "আমি কলকাতায় জোমাটো আর সুইগির জন্য রাতে ডেলিভারি করি, ৩ বছর ধরে",
+    next: "পরের ধাপ",
+    skipType: "বাদ দিন, আমি লিখব",
+    confirmTitle: "আমি কি ঠিক বুঝেছি?",
+    looksRight: "ঠিক আছে",
+    willRemember: "সাথী মনে রাখবে",
+    loginTitle: "লগইন তৈরি করুন",
+    confirmPin: "PIN আবার দিন",
+    pinMismatch: "দুটি PIN মিলছে না",
+    createAccount: "অ্যাকাউন্ট তৈরি করুন",
+    back: "পিছনে",
+    detectedLang: "শনাক্ত ভাষা",
+  },
+  gu: {
+    speak: "બોલો",
+    listening: "સાંભળું છું… રોકવા દબાવો",
+    stopRecording: "રેકોર્ડિંગ રોકો",
+    transcribing: "લખું છું…",
+    micDenied: "માઇકની પરવાનગી મળી નથી.",
+    micUnsupported: "આ બ્રાઉઝરમાં અવાજથી ઇનપુટ ચાલતું નથી.",
+    step: "પગલું",
+    onboardTitle: "સાથીને તમારા કામ વિશે કહો",
+    onboardHint: "બોલો કે લખો: કયા પ્લેટફોર્મ, કયું શહેર, કેવું કામ, ક્યારથી.",
+    onboardExample: "હું અમદાવાદમાં ઝોમેટો અને સ્વિગી માટે રાત્રે ડિલિવરી કરું છું, 3 વર્ષથી",
+    next: "આગળ",
+    skipType: "છોડો, હું લખીશ",
+    confirmTitle: "મેં બરાબર સમજ્યું?",
+    looksRight: "બરાબર છે",
+    willRemember: "સાથી યાદ રાખશે",
+    loginTitle: "તમારું લૉગિન બનાવો",
+    confirmPin: "PIN ફરી નાખો",
+    pinMismatch: "બંને PIN સરખા નથી",
+    createAccount: "ખાતું બનાવો",
+    back: "પાછળ",
+    detectedLang: "ઓળખાયેલી ભાષા",
+  },
+  kn: {
+    speak: "ಮಾತನಾಡಿ",
+    listening: "ಕೇಳುತ್ತಿದ್ದೇನೆ… ನಿಲ್ಲಿಸಲು ಒತ್ತಿ",
+    stopRecording: "ರೆಕಾರ್ಡಿಂಗ್ ನಿಲ್ಲಿಸಿ",
+    transcribing: "ಬರೆಯುತ್ತಿದ್ದೇನೆ…",
+    micDenied: "ಮೈಕ್ ಅನುಮತಿ ಸಿಗಲಿಲ್ಲ.",
+    micUnsupported: "ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ಧ್ವನಿ ಇನ್‌ಪುಟ್ ಇಲ್ಲ.",
+    step: "ಹಂತ",
+    onboardTitle: "ನಿಮ್ಮ ಕೆಲಸದ ಬಗ್ಗೆ ಸಾಥಿಗೆ ಹೇಳಿ",
+    onboardHint: "ಮಾತನಾಡಿ ಅಥವಾ ಬರೆಯಿರಿ: ಯಾವ ಪ್ಲಾಟ್‌ಫಾರ್ಮ್, ಯಾವ ನಗರ, ಯಾವ ಕೆಲಸ, ಯಾವಾಗಿನಿಂದ.",
+    onboardExample: "ನಾನು ಬೆಂಗಳೂರಿನಲ್ಲಿ ಜೊಮ್ಯಾಟೊ ಮತ್ತು ಸ್ವಿಗ್ಗಿಗೆ ರಾತ್ರಿ ಡೆಲಿವರಿ ಮಾಡುತ್ತೇನೆ, 3 ವರ್ಷಗಳಿಂದ",
+    next: "ಮುಂದೆ",
+    skipType: "ಬಿಟ್ಟುಬಿಡಿ, ನಾನೇ ಬರೆಯುತ್ತೇನೆ",
+    confirmTitle: "ನಾನು ಸರಿಯಾಗಿ ಅರ್ಥಮಾಡಿಕೊಂಡೆನೆ?",
+    looksRight: "ಸರಿ ಇದೆ",
+    willRemember: "ಸಾಥಿ ನೆನಪಿಡುತ್ತದೆ",
+    loginTitle: "ನಿಮ್ಮ ಲಾಗಿನ್ ರಚಿಸಿ",
+    confirmPin: "PIN ಮತ್ತೆ ನಮೂದಿಸಿ",
+    pinMismatch: "ಎರಡು PIN ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ",
+    createAccount: "ಖಾತೆ ರಚಿಸಿ",
+    back: "ಹಿಂದೆ",
+    detectedLang: "ಗುರುತಿಸಿದ ಭಾಷೆ",
+  },
+  ml: {
+    speak: "സംസാരിക്കൂ",
+    listening: "കേൾക്കുന്നു… നിർത്താൻ അമർത്തുക",
+    stopRecording: "റെക്കോർഡിംഗ് നിർത്തുക",
+    transcribing: "എഴുതുന്നു…",
+    micDenied: "മൈക്ക് അനുമതി ലഭിച്ചില്ല.",
+    micUnsupported: "ഈ ബ്രൗസറിൽ ശബ്ദ ഇൻപുട്ട് ലഭ്യമല്ല.",
+    step: "ഘട്ടം",
+    onboardTitle: "നിങ്ങളുടെ ജോലിയെക്കുറിച്ച് സാഥിയോട് പറയൂ",
+    onboardHint: "പറയുക അല്ലെങ്കിൽ എഴുതുക: ഏത് പ്ലാറ്റ്‌ഫോം, ഏത് നഗരം, ഏത് ജോലി, എന്നുമുതൽ.",
+    onboardExample: "ഞാൻ കൊച്ചിയിൽ സൊമാറ്റോയ്ക്കും സ്വിഗ്ഗിക്കും രാത്രി ഡെലിവറി ചെയ്യുന്നു, 3 വർഷമായി",
+    next: "അടുത്തത്",
+    skipType: "ഒഴിവാക്കൂ, ഞാൻ എഴുതാം",
+    confirmTitle: "ഞാൻ ശരിയായി മനസ്സിലാക്കിയോ?",
+    looksRight: "ശരിയാണ്",
+    willRemember: "സാഥി ഓർക്കും",
+    loginTitle: "ലോഗിൻ സജ്ജമാക്കുക",
+    confirmPin: "PIN വീണ്ടും നൽകുക",
+    pinMismatch: "രണ്ട് PIN-ഉം ഒന്നല്ല",
+    createAccount: "അക്കൗണ്ട് ഉണ്ടാക്കുക",
+    back: "പിന്നോട്ട്",
+    detectedLang: "തിരിച്ചറിഞ്ഞ ഭാഷ",
+  },
+  mr: {
+    speak: "बोला",
+    listening: "ऐकत आहे… थांबवण्यासाठी दाबा",
+    stopRecording: "रेकॉर्डिंग थांबवा",
+    transcribing: "लिहित आहे…",
+    micDenied: "माइकची परवानगी मिळाली नाही.",
+    micUnsupported: "या ब्राउझरमध्ये आवाजाने इनपुट चालत नाही.",
+    step: "टप्पा",
+    onboardTitle: "साथीला तुमच्या कामाबद्दल सांगा",
+    onboardHint: "बोला किंवा लिहा: कोणते प्लॅटफॉर्म, कोणते शहर, कोणते काम, कधीपासून.",
+    onboardExample: "मी पुण्यात झोमॅटो आणि स्विगीसाठी रात्री डिलिव्हरी करतो, 3 वर्षांपासून",
+    next: "पुढे",
+    skipType: "वगळा, मी लिहीन",
+    confirmTitle: "मी बरोबर समजलो का?",
+    looksRight: "बरोबर आहे",
+    willRemember: "साथी लक्षात ठेवेल",
+    loginTitle: "तुमचे लॉगिन तयार करा",
+    confirmPin: "PIN पुन्हा टाका",
+    pinMismatch: "दोन्ही PIN जुळत नाहीत",
+    createAccount: "खाते तयार करा",
+    back: "मागे",
+    detectedLang: "ओळखलेली भाषा",
+  },
+  od: {
+    speak: "କୁହନ୍ତୁ",
+    listening: "ଶୁଣୁଛି… ବନ୍ଦ କରିବାକୁ ଦବାନ୍ତୁ",
+    stopRecording: "ରେକର୍ଡିଂ ବନ୍ଦ କରନ୍ତୁ",
+    transcribing: "ଲେଖୁଛି…",
+    micDenied: "ମାଇକ୍ ଅନୁମତି ମିଳିଲା ନାହିଁ।",
+    micUnsupported: "ଏହି ବ୍ରାଉଜରରେ ସ୍ୱର ଇନପୁଟ୍ ଚାଲେ ନାହିଁ।",
+    step: "ପଦକ୍ଷେପ",
+    onboardTitle: "ସାଥୀକୁ ଆପଣଙ୍କ କାମ ବିଷୟରେ କୁହନ୍ତୁ",
+    onboardHint: "କୁହନ୍ତୁ କିମ୍ବା ଲେଖନ୍ତୁ: କେଉଁ ପ୍ଲାଟଫର୍ମ, କେଉଁ ସହର, କେଉଁ କାମ, କେବେଠାରୁ।",
+    onboardExample: "ମୁଁ ଭୁବନେଶ୍ୱରରେ ଜୋମାଟୋ ଓ ସୁଇଗି ପାଇଁ ରାତିରେ ଡେଲିଭରି କରେ, 3 ବର୍ଷ ହେଲା",
+    next: "ଆଗକୁ",
+    skipType: "ଛାଡ଼ନ୍ତୁ, ମୁଁ ଲେଖିବି",
+    confirmTitle: "ମୁଁ ଠିକ୍ ବୁଝିଲି କି?",
+    looksRight: "ଠିକ୍ ଅଛି",
+    willRemember: "ସାଥୀ ମନେ ରଖିବ",
+    loginTitle: "ଆପଣଙ୍କ ଲଗଇନ୍ ତିଆରି କରନ୍ତୁ",
+    confirmPin: "PIN ପୁଣି ଦିଅନ୍ତୁ",
+    pinMismatch: "ଦୁଇଟି PIN ମେଳ ଖାଉନାହିଁ",
+    createAccount: "ଖାତା ଖୋଲନ୍ତୁ",
+    back: "ପଛକୁ",
+    detectedLang: "ଚିହ୍ନଟ ଭାଷା",
+  },
+  pa: {
+    speak: "ਬੋਲੋ",
+    listening: "ਸੁਣ ਰਿਹਾ ਹਾਂ… ਰੋਕਣ ਲਈ ਦਬਾਓ",
+    stopRecording: "ਰਿਕਾਰਡਿੰਗ ਰੋਕੋ",
+    transcribing: "ਲਿਖ ਰਿਹਾ ਹਾਂ…",
+    micDenied: "ਮਾਈਕ ਦੀ ਇਜਾਜ਼ਤ ਨਹੀਂ ਮਿਲੀ।",
+    micUnsupported: "ਇਸ ਬ੍ਰਾਊਜ਼ਰ ਵਿੱਚ ਆਵਾਜ਼ ਨਾਲ ਇਨਪੁੱਟ ਨਹੀਂ ਚੱਲਦਾ।",
+    step: "ਕਦਮ",
+    onboardTitle: "ਸਾਥੀ ਨੂੰ ਆਪਣੇ ਕੰਮ ਬਾਰੇ ਦੱਸੋ",
+    onboardHint: "ਬੋਲੋ ਜਾਂ ਲਿਖੋ: ਕਿਹੜੇ ਪਲੇਟਫਾਰਮ, ਕਿਹੜਾ ਸ਼ਹਿਰ, ਕਿਹੋ ਜਿਹਾ ਕੰਮ, ਕਦੋਂ ਤੋਂ।",
+    onboardExample: "ਮੈਂ ਲੁਧਿਆਣਾ ਵਿੱਚ ਜ਼ੋਮੈਟੋ ਤੇ ਸਵਿਗੀ ਲਈ ਰਾਤ ਨੂੰ ਡਿਲੀਵਰੀ ਕਰਦਾ ਹਾਂ, 3 ਸਾਲ ਤੋਂ",
+    next: "ਅੱਗੇ",
+    skipType: "ਛੱਡੋ, ਮੈਂ ਲਿਖਾਂਗਾ",
+    confirmTitle: "ਕੀ ਮੈਂ ਸਹੀ ਸਮਝਿਆ?",
+    looksRight: "ਸਹੀ ਹੈ",
+    willRemember: "ਸਾਥੀ ਯਾਦ ਰੱਖੇਗਾ",
+    loginTitle: "ਆਪਣਾ ਲੌਗਇਨ ਬਣਾਓ",
+    confirmPin: "PIN ਦੁਬਾਰਾ ਪਾਓ",
+    pinMismatch: "ਦੋਵੇਂ PIN ਮੇਲ ਨਹੀਂ ਖਾਂਦੇ",
+    createAccount: "ਖਾਤਾ ਬਣਾਓ",
+    back: "ਪਿੱਛੇ",
+    detectedLang: "ਪਛਾਣੀ ਗਈ ਭਾਸ਼ਾ",
+  },
+  ta: {
+    speak: "பேசுங்கள்",
+    listening: "கேட்கிறேன்… நிறுத்த தட்டவும்",
+    stopRecording: "பதிவை நிறுத்து",
+    transcribing: "எழுதுகிறேன்…",
+    micDenied: "மைக் அனுமதி கிடைக்கவில்லை.",
+    micUnsupported: "இந்த உலாவியில் குரல் உள்ளீடு இல்லை.",
+    step: "படி",
+    onboardTitle: "உங்கள் வேலையைப் பற்றி சாத்தியிடம் சொல்லுங்கள்",
+    onboardHint: "பேசுங்கள் அல்லது எழுதுங்கள்: எந்த தளம், எந்த நகரம், என்ன வேலை, எப்போதிருந்து.",
+    onboardExample: "நான் சென்னையில் ஸொமேட்டோ மற்றும் ஸ்விகிக்கு இரவில் டெலிவரி செய்கிறேன், 3 வருடங்களாக",
+    next: "அடுத்து",
+    skipType: "தவிர்க்க, நானே எழுதுகிறேன்",
+    confirmTitle: "நான் சரியாகப் புரிந்துகொண்டேனா?",
+    looksRight: "சரி",
+    willRemember: "சாத்தி நினைவில் வைக்கும்",
+    loginTitle: "உங்கள் உள்நுழைவை அமைக்கவும்",
+    confirmPin: "PIN மீண்டும் உள்ளிடவும்",
+    pinMismatch: "இரண்டு PIN-ம் பொருந்தவில்லை",
+    createAccount: "கணக்கை உருவாக்கு",
+    back: "பின்",
+    detectedLang: "கண்டறிந்த மொழி",
+  },
+  te: {
+    speak: "మాట్లాడండి",
+    listening: "వింటున్నాను… ఆపడానికి నొక్కండి",
+    stopRecording: "రికార్డింగ్ ఆపండి",
+    transcribing: "రాస్తున్నాను…",
+    micDenied: "మైక్ అనుమతి లభించలేదు.",
+    micUnsupported: "ఈ బ్రౌజర్‌లో వాయిస్ ఇన్‌పుట్ లేదు.",
+    step: "దశ",
+    onboardTitle: "మీ పని గురించి సాథీకి చెప్పండి",
+    onboardHint: "మాట్లాడండి లేదా రాయండి: ఏ ప్లాట్‌ఫారమ్, ఏ నగరం, ఏ పని, ఎప్పటి నుండి.",
+    onboardExample: "నేను హైదరాబాద్‌లో జొమాటో మరియు స్విగ్గీకి రాత్రి డెలివరీ చేస్తాను, 3 సంవత్సరాలుగా",
+    next: "తర్వాత",
+    skipType: "దాటవేయి, నేనే రాస్తాను",
+    confirmTitle: "నేను సరిగ్గా అర్థం చేసుకున్నానా?",
+    looksRight: "సరిగ్గా ఉంది",
+    willRemember: "సాథీ గుర్తుంచుకుంటుంది",
+    loginTitle: "మీ లాగిన్ సెట్ చేయండి",
+    confirmPin: "PIN మళ్లీ నమోదు చేయండి",
+    pinMismatch: "రెండు PIN-లు సరిపోలడం లేదు",
+    createAccount: "ఖాతా సృష్టించండి",
+    back: "వెనుకకు",
+    detectedLang: "గుర్తించిన భాష",
+  },
+  as: {
+    speak: "কওক",
+    listening: "শুনি আছোঁ… ৰখাবলৈ টিপক",
+    stopRecording: "ৰেকৰ্ডিং বন্ধ কৰক",
+    transcribing: "লিখি আছোঁ…",
+    micDenied: "মাইকৰ অনুমতি পোৱা নগ'ল।",
+    micUnsupported: "এই ব্ৰাউজাৰত কণ্ঠস্বৰ ইনপুট নচলে।",
+    step: "পদক্ষেপ",
+    onboardTitle: "সাথীক আপোনাৰ কামৰ বিষয়ে কওক",
+    onboardHint: "কওক বা লিখক: কোনবোৰ প্লেটফৰ্ম, কোন চহৰ, কি ধৰণৰ কাম, কেতিয়াৰ পৰা।",
+    onboardExample: "মই গুৱাহাটীত জোমাটো আৰু চুইগীৰ বাবে ৰাতি ডেলিভাৰী কৰোঁ, ৩ বছৰ ধৰি",
+    next: "পৰৱৰ্তী",
+    skipType: "এৰি দিয়ক, মই লিখিম",
+    confirmTitle: "মই শুদ্ধকৈ বুজিলোঁনে?",
+    looksRight: "শুদ্ধ আছে",
+    willRemember: "সাথীয়ে মনত ৰাখিব",
+    loginTitle: "আপোনাৰ লগইন সাজু কৰক",
+    confirmPin: "PIN পুনৰ দিয়ক",
+    pinMismatch: "দুয়োটা PIN মিলা নাই",
+    createAccount: "একাউণ্ট সৃষ্টি কৰক",
+    back: "পিছলৈ",
+    detectedLang: "চিনাক্ত কৰা ভাষা",
+  },
+  ur: {
+    speak: "بولیں",
+    listening: "سن رہا ہوں… روکنے کے لیے دبائیں",
+    stopRecording: "ریکارڈنگ روکیں",
+    transcribing: "لکھ رہا ہوں…",
+    micDenied: "مائیک کی اجازت نہیں ملی۔",
+    micUnsupported: "اس براؤزر میں آواز سے ان پٹ نہیں چلتا۔",
+    step: "مرحلہ",
+    onboardTitle: "ساتھی کو اپنے کام کے بارے میں بتائیں",
+    onboardHint: "بولیں یا لکھیں: کون سے پلیٹ فارم، کون سا شہر، کس طرح کا کام، کب سے۔",
+    onboardExample: "میں لکھنؤ میں زوماٹو اور سوئگی کے لیے رات کو ڈیلیوری کرتا ہوں، 3 سال سے",
+    next: "آگے",
+    skipType: "چھوڑیں، میں خود لکھوں گا",
+    confirmTitle: "کیا میں نے صحیح سمجھا؟",
+    looksRight: "صحیح ہے",
+    willRemember: "ساتھی یاد رکھے گا",
+    loginTitle: "اپنا لاگ ان بنائیں",
+    confirmPin: "PIN دوبارہ ڈالیں",
+    pinMismatch: "دونوں PIN ایک جیسے نہیں",
+    createAccount: "اکاؤنٹ بنائیں",
+    back: "پیچھے",
+    detectedLang: "پہچانی گئی زبان",
+  },
+};
+
+export type Strings = Base & OnboardingStrings;
 
 export const DEFAULT_LANG = "hi";
 
@@ -1060,7 +1369,8 @@ export function isSupportedLang(code: string | null | undefined): code is string
 }
 
 export function t(lang: string): Strings {
-  return strings[lang] ?? strings[DEFAULT_LANG];
+  const code = lang in strings ? lang : DEFAULT_LANG;
+  return { ...strings[code], ...(onboarding[code] ?? onboardingEn) };
 }
 
 export const WORK_TYPES = ["delivery", "driver", "home_services", "daily_wage", "other"] as const;
