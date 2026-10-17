@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import LangSync from "@/components/LangSync";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="hi" className="h-full antialiased">
       <body className="flex min-h-full flex-col bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+        <LangSync />
         {children}
       </body>
     </html>

@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { api, setLang, setToken, type AuthResponse } from "@/lib/api";
+import { applyLang } from "@/components/LangSync";
+import { api, getLang, setLang, setToken, type AuthResponse } from "@/lib/api";
 import { t } from "@/lib/i18n";
 import { Button, Card, ErrorText, Input, Label } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
-  const s = t("hi");
+  const s = t(getLang());
   const [phone, setPhone] = useState("");
   const [pin, setPin] = useState("");
   const [busy, setBusy] = useState(false);
@@ -23,6 +24,7 @@ export default function LoginPage() {
       const res = await api.post<AuthResponse>("/auth/login", { phone, pin });
       setToken(res.token);
       setLang(res.user.language);
+      applyLang(res.user.language);
       router.push("/home");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

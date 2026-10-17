@@ -14,8 +14,9 @@ class User(Base):
     pin_hash: Mapped[str] = mapped_column(String(255))
     name: Mapped[str] = mapped_column(String(100), default="")
     language: Mapped[str] = mapped_column(String(10), default="hi")
-    work_type: Mapped[str] = mapped_column(String(50), default="")
-    platform: Mapped[str] = mapped_column(String(50), default="")
+    # Comma-separated lists; see app.util.split_csv / join_csv.
+    work_type: Mapped[str] = mapped_column(String(255), default="")
+    platform: Mapped[str] = mapped_column(String(255), default="")
     city: Mapped[str] = mapped_column(String(100), default="")
     memory: Mapped[str] = mapped_column(Text, default="")
     role: Mapped[str] = mapped_column(String(20), default="worker")

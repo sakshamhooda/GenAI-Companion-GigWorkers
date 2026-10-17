@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import get_current_user
-from app.context import SYSTEM_PROMPT, build_context
+from app.context import build_context, system_prompt_for
 from app.db import get_session
 from app.llm import generate
 from app.models import Message, User
@@ -48,7 +48,7 @@ async def chat(
         f"RECENT CONVERSATION\n{transcript or '(none)'}\n\n"
         f"Worker: {body.message}\nSaathi:"
     )
-    reply = generate(prompt, SYSTEM_PROMPT)
+    reply = generate(prompt, system_prompt_for(user))
     session.add_all(
         [
             Message(user_id=user.id, role="user", content=body.message),

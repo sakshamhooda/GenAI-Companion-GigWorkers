@@ -50,6 +50,9 @@ async def create_tables() -> None:
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        # create_all never alters existing tables; widen the two list columns in place.
+        for col in ("work_type", "platform"):
+            await conn.execute(text(f"ALTER TABLE users ALTER COLUMN {col} TYPE VARCHAR(255)"))
 
 
 async def check_database() -> bool:

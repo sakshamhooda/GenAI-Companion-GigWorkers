@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth import get_current_user
-from app.context import SYSTEM_PROMPT, build_context
+from app.context import build_context, system_prompt_for
 from app.db import get_session
 from app.llm import extract_json
 from app.models import Grievance, User
@@ -12,18 +12,16 @@ from app.schemas import GrievanceIn, GrievanceOut
 
 router = APIRouter(prefix="/grievances", tags=["grievances"])
 
-DRAFT_SYSTEM = (
-    SYSTEM_PROMPT
-    + """
+DRAFT_TASK = """
 TASK: Draft a complaint the worker can send to the platform, contractor or authority.
 Return ONLY JSON with keys:
-- draft_local: the complaint in the worker's language (from the context), polite but firm,
-  5-10 short sentences, with a clear ask (refund, explanation, reinstatement, payment).
+- draft_local: the complaint in the worker's language and script (see the LANGUAGE line in
+  the context), polite but firm, 5-10 short sentences, with a clear ask (refund,
+  explanation, reinstatement, payment).
 - draft_english: the same complaint in formal English.
 Cite relevant earnings entries from the context as evidence (dates and amounts).
 Use placeholders like [ORDER ID] or [DATE] for details you do not have. No markdown.
 """
-)
 
 
 @router.post("/draft", response_model=GrievanceOut, status_code=status.HTTP_201_CREATED)
@@ -41,7 +39,7 @@ async def draft(
         "draft_local": f"[stub] {body.kind}: {body.description}",
         "draft_english": f"[stub] {body.kind}: {body.description}",
     }
-    data = extract_json(prompt, DRAFT_SYSTEM, stub=stub)
+    data = extract_json(prompt, system_prompt_for(user) + DRAFT_TASK, stub=stub)
     item = Grievance(
         user_id=user.id,
         kind=body.kind,
