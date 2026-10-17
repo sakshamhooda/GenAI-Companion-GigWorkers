@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
+import SpeakButton from "@/components/SpeakButton";
 import { Badge, Button, Card } from "@/components/ui";
 import { api, type Analytics } from "@/lib/api";
 import { t } from "@/lib/i18n";
@@ -107,7 +108,10 @@ export default function AnalyticsPage() {
 
             {data.insight ? (
               <Card className="border-accent/50">
-                <h3 className="mb-1 text-sm font-semibold text-muted">{s.insight}</h3>
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-semibold text-muted">{s.insight}</h3>
+                  <SpeakButton text={data.insight} lang={lang} size="sm" />
+                </div>
                 <p lang={lang} className="text-base">
                   {data.insight}
                 </p>

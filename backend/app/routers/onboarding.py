@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 from app import ratelimit
 from app.context import worker_input
 from app.languages import LANGUAGES, is_supported
-from app.llm import extract_json
+from app.llm import aextract_json
 from app.schemas import OnboardingIn, OnboardingOut
 from app.voice import KEYTERMS
 
@@ -60,7 +60,7 @@ Return JSON with exactly these keys:
 )
 async def parse_onboarding(body: OnboardingIn) -> OnboardingOut:
     """Public: turns a spoken/typed self-introduction into profile fields."""
-    data = extract_json(_prompt(body.text, body.language_hint), SYSTEM, stub=STUB)
+    data = await aextract_json(_prompt(body.text, body.language_hint), SYSTEM, stub=STUB)
     language = data.get("language")
     if not is_supported(language):
         language = body.language_hint if is_supported(body.language_hint) else None

@@ -3,17 +3,19 @@
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState, type FormEvent } from "react";
 import AppShell from "@/components/AppShell";
+import SpeakButton from "@/components/SpeakButton";
 import { Button, Card, ErrorText, Label, Select, Textarea } from "@/components/ui";
 import { ApiError, api, type Grievance } from "@/lib/api";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/lib/useLang";
 
-function DraftCard({ title, text, lang, copyLabel, copiedLabel }: {
+function DraftCard({ title, text, lang, copyLabel, copiedLabel, speak = false }: {
   title: string;
   text: string;
   lang: string;
   copyLabel: string;
   copiedLabel: string;
+  speak?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
   async function copy() {
@@ -29,9 +31,12 @@ function DraftCard({ title, text, lang, copyLabel, copiedLabel }: {
     <Card>
       <div className="mb-2 flex items-center justify-between">
         <h3 className="font-semibold">{title}</h3>
-        <Button type="button" variant="secondary" onClick={copy}>
-          {copied ? copiedLabel : copyLabel}
-        </Button>
+        <div className="flex items-center gap-2">
+          {speak ? <SpeakButton text={text} lang={lang} size="sm" /> : null}
+          <Button type="button" variant="secondary" onClick={copy}>
+            {copied ? copiedLabel : copyLabel}
+          </Button>
+        </div>
       </div>
       <p lang={lang} className="whitespace-pre-wrap text-base">
         {text}
@@ -108,7 +113,7 @@ function GrievanceForm() {
 
       {result && (
         <>
-          <DraftCard title={s.draftLocal} text={result.draft_local} lang={lang} copyLabel={s.copy} copiedLabel={s.copied} />
+          <DraftCard title={s.draftLocal} text={result.draft_local} lang={lang} copyLabel={s.copy} copiedLabel={s.copied} speak />
           <DraftCard title={s.draftEnglish} text={result.draft_english} lang="en" copyLabel={s.copy} copiedLabel={s.copied} />
         </>
       )}

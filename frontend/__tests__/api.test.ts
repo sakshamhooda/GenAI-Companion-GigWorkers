@@ -29,10 +29,10 @@ describe("api client", () => {
 
   it("serialises the body on POST and sends no Authorization without a token", async () => {
     const fetchMock = mockFetch(201, { ok: true });
-    await api.post("/auth/login", { phone: "9999999999", pin: "1234" });
+    await api.post("/auth/login", { phone: "6000000000", pin: "0000" });
     const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(init.method).toBe("POST");
-    expect(JSON.parse(init.body as string)).toEqual({ phone: "9999999999", pin: "1234" });
+    expect(JSON.parse(init.body as string)).toEqual({ phone: "6000000000", pin: "0000" });
     expect((init.headers as Record<string, string>).Authorization).toBeUndefined();
   });
 

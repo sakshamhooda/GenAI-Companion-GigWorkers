@@ -32,7 +32,14 @@ def get_engine() -> AsyncEngine | None:
     """Lazily create the async engine. Returns None when no DATABASE_URL is configured."""
     global _engine
     if _engine is None and settings.database_url:
-        _engine = create_async_engine(to_async_url(settings.database_url), pool_pre_ping=True)
+        url = to_async_url(settings.database_url)
+        # SQLite (tests) has no pool options; Postgres gets a bounded, recycled pool.
+        pool_kwargs = (
+            {}
+            if url.startswith("sqlite")
+            else {"pool_size": 5, "max_overflow": 10, "pool_recycle": 1800, "pool_timeout": 10}
+        )
+        _engine = create_async_engine(url, pool_pre_ping=True, **pool_kwargs)
     return _engine
 
 

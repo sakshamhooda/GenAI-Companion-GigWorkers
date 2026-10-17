@@ -11,17 +11,15 @@ Built for the PromptWars hackathon (Google for Developers + Hack2Skill).
 - App: https://frontend-production-2b281.up.railway.app
 - API health: https://backend-production-bffb.up.railway.app/health
 
-### Demo logins
+### Trying it without an account
 
-| Role | Phone | PIN | Notes |
-|---|---|---|---|
-| Worker | `9999999999` | `1234` | Ramesh, delivers for Zomato and Swiggy in Jaipur, seeded with a week of earnings |
+Press **Continue with Google (demo)** on the login page. It signs you into a seeded demo worker with a week of earnings, no credentials needed. The button is replaced by real Google sign-in as soon as a Google OAuth client is configured. No login credentials are stored in this repository or shown in the app; an optional phone-and-PIN demo worker is seeded only from `DEMO_PHONE` and `DEMO_PIN` environment variables.
 
 Or register a new worker: speak about your work, confirm what Saathi understood, set a PIN.
 
 ### Evaluator quick path
 
-1. **Log in** with the demo worker. The interface is in Hindi; switch it from the landing page if you prefer.
+1. **Sign in** with the Google demo button on the login page. The interface follows the language switcher in the header.
 2. **Log earnings in plain words** on Home: type or say "aaj 850 kamaye, 120 petrol". Saathi parses amount, expenses and platform; confirm to save. The weekly card updates.
 3. **Ask for safety advice** in Chat: "raat ko delivery ke liye safety tips". The answer uses the worker's city and work, with emergency numbers.
 4. **Draft a complaint** under Help: pick "payout deduction", describe it, and get a draft in Hindi and formal English that cites the logged earnings. Copy it.

@@ -6,7 +6,7 @@ from app import ratelimit
 from app.auth import get_current_user
 from app.context import build_context, system_prompt_for, worker_input
 from app.db import get_session
-from app.llm import extract_json
+from app.llm import aextract_json
 from app.models import Grievance, User
 from app.routers.earnings import recent_earnings
 from app.schemas import GrievanceIn, GrievanceOut
@@ -45,7 +45,7 @@ async def draft(
         "draft_local": f"[stub] {body.kind}: {body.description}",
         "draft_english": f"[stub] {body.kind}: {body.description}",
     }
-    data = extract_json(prompt, system_prompt_for(user) + DRAFT_TASK, stub=stub)
+    data = await aextract_json(prompt, system_prompt_for(user) + DRAFT_TASK, stub=stub)
     item = Grievance(
         user_id=user.id,
         kind=body.kind,

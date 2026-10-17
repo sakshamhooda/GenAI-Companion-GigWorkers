@@ -9,6 +9,7 @@ Behaviour:
   when a key is configured, so a worker never sees placeholder data by mistake.
 """
 
+import asyncio
 import json
 import logging
 import time
@@ -133,3 +134,24 @@ def extract_json_multimodal(
 
     contents = [types.Part.from_bytes(data=data, mime_type=mime_type), prompt]
     return _parse_json(_generate_with_retry(client, contents, system, json_mode=True))
+
+
+# Async wrappers for request handlers. The SDK call is blocking (network + retries), so it
+# runs in a worker thread and the event loop keeps serving other requests meanwhile.
+
+
+async def agenerate(prompt: str, system: str | None = None) -> str:
+    """Non-blocking ``generate`` for use inside async handlers."""
+    return await asyncio.to_thread(generate, prompt, system)
+
+
+async def aextract_json(prompt: str, system: str | None = None, stub: dict | None = None) -> dict:
+    """Non-blocking ``extract_json`` for use inside async handlers."""
+    return await asyncio.to_thread(extract_json, prompt, system, stub)
+
+
+async def aextract_json_multimodal(
+    prompt: str, data: bytes, mime_type: str, system: str | None = None
+) -> dict:
+    """Non-blocking ``extract_json_multimodal`` for use inside async handlers."""
+    return await asyncio.to_thread(extract_json_multimodal, prompt, data, mime_type, system)

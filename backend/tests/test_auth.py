@@ -1,6 +1,7 @@
 from httpx import AsyncClient
 
-from app.seed import DEMO_PHONE, DEMO_PIN
+from app.config import settings
+from app.seed import seed_demo
 
 
 async def test_register_rejects_unknown_language(client: AsyncClient) -> None:
@@ -67,8 +68,20 @@ async def test_login_success(client: AsyncClient, worker: dict) -> None:
     assert res.json()["user"]["id"] == worker["user"]["id"]
 
 
-async def test_demo_user_is_seeded(client: AsyncClient) -> None:
-    res = await client.post("/auth/login", json={"phone": DEMO_PHONE, "pin": DEMO_PIN})
+async def test_demo_user_seeded_only_from_environment(client: AsyncClient, monkeypatch) -> None:
+    # Nothing configured: no demo worker exists.
+    monkeypatch.setattr(settings, "demo_phone", None)
+    monkeypatch.setattr(settings, "demo_pin", None)
+    await seed_demo()
+    res = await client.post("/auth/login", json={"phone": "9000000001", "pin": "2468"})
+    assert res.status_code == 401
+
+    # Configured via settings (environment): seeded idempotently and can log in.
+    monkeypatch.setattr(settings, "demo_phone", "9000000001")
+    monkeypatch.setattr(settings, "demo_pin", "2468")
+    await seed_demo()
+    await seed_demo()
+    res = await client.post("/auth/login", json={"phone": "9000000001", "pin": "2468"})
     assert res.status_code == 200
     user = res.json()["user"]
     assert user["name"] == "Ramesh"

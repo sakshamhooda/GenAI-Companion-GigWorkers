@@ -1,14 +1,31 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import GoogleButton from "@/components/GoogleButton";
 import TopBar from "@/components/TopBar";
+import { setLang, setToken, type AuthResponse } from "@/lib/api";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/lib/useLang";
 
-/** Landing: pitch, login/register, demo hint. Language and theme controls live in the header. */
+/**
+ * Landing: pitch, login/register and the Google button (real or demo). No credentials are
+ * shown anywhere; the demo path is a one-tap sign-in. Language and theme controls live in
+ * the header.
+ */
 export default function LandingPage() {
   const lang = useLang();
   const s = t(lang);
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+
+  function onSignedIn(res: AuthResponse) {
+    setToken(res.token);
+    setLang(res.user.language);
+    const needsProfile = res.is_new || res.user.platforms.length === 0;
+    router.push(needsProfile ? "/register?step=2" : "/home");
+  }
 
   return (
     <>
@@ -40,9 +57,14 @@ export default function LandingPage() {
             {s.register}
           </Link>
         </div>
-        <p className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-center text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
-          {s.demoHint}
-        </p>
+        <div className="flex flex-col items-center gap-2">
+          <GoogleButton onSignedIn={onSignedIn} onError={setError} />
+          {error ? (
+            <p role="alert" className="text-center text-sm text-red-600 dark:text-red-400">
+              {error}
+            </p>
+          ) : null}
+        </div>
       </main>
     </>
   );

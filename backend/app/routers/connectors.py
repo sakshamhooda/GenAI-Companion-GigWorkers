@@ -10,7 +10,7 @@ from app import ratelimit
 from app.auth import get_current_user
 from app.connectors import BY_ID, CONNECTORS, IMPLEMENTATIONS, DemoConnector
 from app.db import get_session
-from app.llm import _get_client, extract_json_multimodal
+from app.llm import _get_client, aextract_json_multimodal
 from app.models import Connection, User
 from app.schemas import ConnectorOut, ConnectResult, ScreenshotEntry, ScreenshotImportOut
 from app.util import split_csv
@@ -136,7 +136,7 @@ async def import_screenshot(
             f"Today's date: {date.today().isoformat()}. "
             f"Worker's platforms: {', '.join(platforms) or 'unknown'}."
         )
-        result = extract_json_multimodal(prompt, data, content_type, SCREENSHOT_SYSTEM)
+        result = await aextract_json_multimodal(prompt, data, content_type, SCREENSHOT_SYSTEM)
     entries: list[ScreenshotEntry] = []
     for raw in result.get("entries") or []:
         if not isinstance(raw, dict):

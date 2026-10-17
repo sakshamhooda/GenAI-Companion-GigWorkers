@@ -8,7 +8,17 @@ import TopBar from "@/components/TopBar";
 import { useLang } from "@/lib/useLang";
 import { applyLang } from "@/components/LangSync";
 import MicButton from "@/components/MicButton";
-import { Button, Card, ChipGroup, ErrorText, Input, Label, Select, Textarea } from "@/components/ui";
+import {
+  Button,
+  Card,
+  ChipGroup,
+  ErrorText,
+  Input,
+  Label,
+  PinInput,
+  Select,
+  Textarea,
+} from "@/components/ui";
 import {
   api,
   getLang,
@@ -315,28 +325,26 @@ export default function RegisterPage() {
             </div>
             <div>
               <Label htmlFor="pin">{s.pin}</Label>
-              <Input
+              <PinInput
                 id="pin"
-                type="password"
-                inputMode="numeric"
-                pattern="[0-9]{4}"
-                maxLength={4}
+                autoComplete="new-password"
                 required
                 value={login.pin}
-                onChange={(e) => setLogin({ ...login, pin: e.target.value.replace(/\D/g, "") })}
+                onChange={(pin) => setLogin({ ...login, pin })}
+                showLabel={s.showPin}
+                hideLabel={s.hidePin}
               />
             </div>
             <div>
               <Label htmlFor="pin2">{s.confirmPin}</Label>
-              <Input
+              <PinInput
                 id="pin2"
-                type="password"
-                inputMode="numeric"
-                pattern="[0-9]{4}"
-                maxLength={4}
+                autoComplete="new-password"
                 required
                 value={login.pin2}
-                onChange={(e) => setLogin({ ...login, pin2: e.target.value.replace(/\D/g, "") })}
+                onChange={(pin2) => setLogin({ ...login, pin2 })}
+                showLabel={s.showPin}
+                hideLabel={s.hidePin}
               />
             </div>
             <ErrorText>{error}</ErrorText>

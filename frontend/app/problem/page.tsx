@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import AppShell from "@/components/AppShell";
 import MicButton from "@/components/MicButton";
+import SpeakButton from "@/components/SpeakButton";
 import { Badge, Button, Card, ErrorText, Label, Textarea } from "@/components/ui";
 import { ApiError, api, type ProblemRecord, type ProblemResult, type User } from "@/lib/api";
 import { t, type Strings } from "@/lib/i18n";
@@ -25,7 +26,10 @@ function ResultView({ r, s, lang, onRemember, remembered }: { r: ProblemResult; 
       <Card>
         <div className="mb-2 flex items-center justify-between gap-2">
           <Badge tone={urgencyTone(r.urgency)}>{label(s.urgency, r.urgency)}</Badge>
-          <span className="text-xs text-muted">{r.category}</span>
+          <span className="flex items-center gap-2 text-xs text-muted">
+            {r.category}
+            <SpeakButton text={r.summary} lang={lang} size="md" />
+          </span>
         </div>
         <p lang={lang} className="text-base">
           {r.summary}
@@ -63,6 +67,9 @@ function ResultView({ r, s, lang, onRemember, remembered }: { r: ProblemResult; 
                   </span>
                   <span aria-hidden="true">{open === i ? "▾" : "▸"}</span>
                 </button>
+                <div className="flex justify-end px-3 pb-1">
+                  <SpeakButton text={[o.title, ...o.steps].join(". ")} lang={lang} size="sm" />
+                </div>
                 {open === i ? (
                   <div className="space-y-2 px-3 pb-3 text-sm" lang={lang}>
                     <div className="flex flex-wrap gap-2">

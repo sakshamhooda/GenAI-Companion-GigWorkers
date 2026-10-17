@@ -25,6 +25,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body className="flex min-h-full flex-col bg-bg text-fg">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-50 focus:rounded-lg focus:bg-accent focus:px-3 focus:py-2 focus:text-accent-fg"
+        >
+          Skip to content
+        </a>
         <LangSync />
         {children}
       </body>

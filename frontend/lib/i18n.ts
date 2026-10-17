@@ -8,7 +8,6 @@ const en = {
   login: "Login",
   register: "Register",
   logout: "Logout",
-  demoHint: "Demo login: phone 9999999999, PIN 1234",
   phone: "Phone number",
   pin: "4-digit PIN",
   name: "Name",
@@ -89,7 +88,6 @@ const hi: Base = {
   login: "लॉगिन",
   register: "नया खाता",
   logout: "लॉगआउट",
-  demoHint: "डेमो लॉगिन: फ़ोन 9999999999, PIN 1234",
   phone: "फ़ोन नंबर",
   pin: "4 अंकों का PIN",
   name: "नाम",
@@ -168,7 +166,6 @@ const bn: Base = {
   login: "লগইন",
   register: "নতুন অ্যাকাউন্ট",
   logout: "লগআউট",
-  demoHint: "ডেমো লগইন: ফোন 9999999999, PIN 1234",
   phone: "ফোন নম্বর",
   pin: "৪ অঙ্কের PIN",
   name: "নাম",
@@ -247,7 +244,6 @@ const gu: Base = {
   login: "લૉગિન",
   register: "નવું ખાતું",
   logout: "લૉગઆઉટ",
-  demoHint: "ડેમો લૉગિન: ફોન 9999999999, PIN 1234",
   phone: "ફોન નંબર",
   pin: "4 અંકનો PIN",
   name: "નામ",
@@ -326,7 +322,6 @@ const kn: Base = {
   login: "ಲಾಗಿನ್",
   register: "ಹೊಸ ಖಾತೆ",
   logout: "ಲಾಗೌಟ್",
-  demoHint: "ಡೆಮೊ ಲಾಗಿನ್: ಫೋನ್ 9999999999, PIN 1234",
   phone: "ಫೋನ್ ಸಂಖ್ಯೆ",
   pin: "4 ಅಂಕಿಯ PIN",
   name: "ಹೆಸರು",
@@ -405,7 +400,6 @@ const ml: Base = {
   login: "ലോഗിൻ",
   register: "പുതിയ അക്കൗണ്ട്",
   logout: "ലോഗൗട്ട്",
-  demoHint: "ഡെമോ ലോഗിൻ: ഫോൺ 9999999999, PIN 1234",
   phone: "ഫോൺ നമ്പർ",
   pin: "4 അക്ക PIN",
   name: "പേര്",
@@ -484,7 +478,6 @@ const mr: Base = {
   login: "लॉगिन",
   register: "नवीन खाते",
   logout: "लॉगआउट",
-  demoHint: "डेमो लॉगिन: फोन 9999999999, PIN 1234",
   phone: "फोन नंबर",
   pin: "4 अंकी PIN",
   name: "नाव",
@@ -563,7 +556,6 @@ const od: Base = {
   login: "ଲଗଇନ୍",
   register: "ନୂଆ ଖାତା",
   logout: "ଲଗଆଉଟ୍",
-  demoHint: "ଡେମୋ ଲଗଇନ୍: ଫୋନ୍ 9999999999, PIN 1234",
   phone: "ଫୋନ୍ ନମ୍ବର",
   pin: "4 ଅଙ୍କ PIN",
   name: "ନାମ",
@@ -642,7 +634,6 @@ const pa: Base = {
   login: "ਲੌਗਇਨ",
   register: "ਨਵਾਂ ਖਾਤਾ",
   logout: "ਲੌਗਆਉਟ",
-  demoHint: "ਡੈਮੋ ਲੌਗਇਨ: ਫ਼ੋਨ 9999999999, PIN 1234",
   phone: "ਫ਼ੋਨ ਨੰਬਰ",
   pin: "4 ਅੰਕਾਂ ਦਾ PIN",
   name: "ਨਾਮ",
@@ -721,7 +712,6 @@ const ta: Base = {
   login: "உள்நுழை",
   register: "புதிய கணக்கு",
   logout: "வெளியேறு",
-  demoHint: "டெமோ உள்நுழைவு: போன் 9999999999, PIN 1234",
   phone: "தொலைபேசி எண்",
   pin: "4 இலக்க PIN",
   name: "பெயர்",
@@ -800,7 +790,6 @@ const te: Base = {
   login: "లాగిన్",
   register: "కొత్త ఖాతా",
   logout: "లాగౌట్",
-  demoHint: "డెమో లాగిన్: ఫోన్ 9999999999, PIN 1234",
   phone: "ఫోన్ నంబర్",
   pin: "4 అంకెల PIN",
   name: "పేరు",
@@ -879,7 +868,6 @@ const as: Base = {
   login: "লগইন",
   register: "নতুন একাউণ্ট",
   logout: "লগআউট",
-  demoHint: "ডেমো লগইন: ফোন 9999999999, PIN 1234",
   phone: "ফোন নম্বৰ",
   pin: "৪ অংকৰ PIN",
   name: "নাম",
@@ -958,7 +946,6 @@ const ur: Base = {
   login: "لاگ ان",
   register: "نیا اکاؤنٹ",
   logout: "لاگ آؤٹ",
-  demoHint: "ڈیمو لاگ ان: فون 9999999999، PIN 1234",
   phone: "فون نمبر",
   pin: "4 ہندسوں کا PIN",
   name: "نام",
@@ -1575,7 +1562,33 @@ const feat: Record<string, FeatStrings> = {
   },
 };
 
-export type Strings = Base & OnboardingStrings & AuthStrings & FeatStrings;
+// Voice playback and PIN visibility.
+const voiceEn = {
+  listen: "Listen",
+  stop: "Stop",
+  ttsUnavailable: "Audio unavailable right now",
+  showPin: "Show PIN",
+  hidePin: "Hide PIN",
+};
+type VoiceStrings = typeof voiceEn;
+
+const voice: Record<string, VoiceStrings> = {
+  en: voiceEn,
+  hi: { listen: "सुनें", stop: "रोकें", ttsUnavailable: "अभी आवाज़ उपलब्ध नहीं", showPin: "PIN दिखाएँ", hidePin: "PIN छिपाएँ" },
+  bn: { listen: "শুনুন", stop: "থামান", ttsUnavailable: "এখন অডিও পাওয়া যাচ্ছে না", showPin: "PIN দেখান", hidePin: "PIN লুকান" },
+  gu: { listen: "સાંભળો", stop: "રોકો", ttsUnavailable: "અત્યારે ઑડિયો ઉપલબ્ધ નથી", showPin: "PIN બતાવો", hidePin: "PIN છુપાવો" },
+  kn: { listen: "ಕೇಳಿ", stop: "ನಿಲ್ಲಿಸಿ", ttsUnavailable: "ಈಗ ಆಡಿಯೋ ಲಭ್ಯವಿಲ್ಲ", showPin: "PIN ತೋರಿಸಿ", hidePin: "PIN ಮರೆಮಾಡಿ" },
+  ml: { listen: "കേൾക്കുക", stop: "നിർത്തുക", ttsUnavailable: "ഇപ്പോൾ ഓഡിയോ ലഭ്യമല്ല", showPin: "PIN കാണിക്കുക", hidePin: "PIN മറയ്ക്കുക" },
+  mr: { listen: "ऐका", stop: "थांबवा", ttsUnavailable: "सध्या आवाज उपलब्ध नाही", showPin: "PIN दाखवा", hidePin: "PIN लपवा" },
+  od: { listen: "ଶୁଣନ୍ତୁ", stop: "ବନ୍ଦ କରନ୍ତୁ", ttsUnavailable: "ବର୍ତ୍ତମାନ ଅଡିଓ ଉପଲବ୍ଧ ନାହିଁ", showPin: "PIN ଦେଖାନ୍ତୁ", hidePin: "PIN ଲୁଚାନ୍ତୁ" },
+  pa: { listen: "ਸੁਣੋ", stop: "ਰੋਕੋ", ttsUnavailable: "ਹੁਣੇ ਆਡੀਓ ਉਪਲਬਧ ਨਹੀਂ", showPin: "PIN ਦਿਖਾਓ", hidePin: "PIN ਲੁਕਾਓ" },
+  ta: { listen: "கேளுங்கள்", stop: "நிறுத்து", ttsUnavailable: "இப்போது ஒலி கிடைக்கவில்லை", showPin: "PIN காட்டு", hidePin: "PIN மறை" },
+  te: { listen: "వినండి", stop: "ఆపండి", ttsUnavailable: "ఇప్పుడు ఆడియో అందుబాటులో లేదు", showPin: "PIN చూపించు", hidePin: "PIN దాచు" },
+  as: { listen: "শুনক", stop: "বন্ধ কৰক", ttsUnavailable: "এতিয়া অডিঅ' উপলব্ধ নহয়", showPin: "PIN দেখুৱাওক", hidePin: "PIN লুকুৱাওক" },
+  ur: { listen: "سنیں", stop: "روکیں", ttsUnavailable: "ابھی آڈیو دستیاب نہیں", showPin: "PIN دکھائیں", hidePin: "PIN چھپائیں" },
+};
+
+export type Strings = Base & OnboardingStrings & AuthStrings & FeatStrings & VoiceStrings;
 
 export const DEFAULT_LANG = "hi";
 
@@ -1611,6 +1624,7 @@ export function t(lang: string): Strings {
     ...(onboarding[code] ?? onboardingEn),
     ...(authStrings[code] ?? authEn),
     ...(feat[code] ?? featEn),
+    ...(voice[code] ?? voiceEn),
   };
 }
 

@@ -243,10 +243,31 @@ async function upload<T>(path: string, form: FormData): Promise<T> {
   return (await res.json()) as T;
 }
 
+/** POST JSON and return the raw response body as a Blob (audio, files). */
+async function postBlob(path: string, body: unknown): Promise<Blob> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const token = getToken();
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(`${BASE_URL}${path}`, { method: "POST", headers, body: JSON.stringify(body) });
+  if (!res.ok) {
+    let message = `Request failed (${res.status})`;
+    try {
+      const data = await res.json();
+      if (typeof data?.detail === "string") message = data.detail;
+    } catch {
+      /* no json body */
+    }
+    if (res.status === 401) clearToken();
+    throw new ApiError(res.status, message);
+  }
+  return await res.blob();
+}
+
 export const api = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
   put: <T>(path: string, body?: unknown) => request<T>("PUT", path, body),
   delete: <T>(path: string) => request<T>("DELETE", path),
   upload,
+  postBlob,
 };

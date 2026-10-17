@@ -124,6 +124,13 @@ class TranscriptOut(BaseModel):
     provider: str
 
 
+class SpeakIn(BaseModel):
+    """Text to read aloud; `language` defaults to the worker's profile language."""
+
+    text: str = Field(min_length=1, max_length=4000)
+    language: str | None = Field(default=None, max_length=5)
+
+
 class LoginIn(BaseModel):
     phone: str = Field(pattern=PHONE_PATTERN)
     pin: str = Field(pattern=PIN_PATTERN)

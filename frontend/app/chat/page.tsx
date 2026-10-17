@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import AppShell from "@/components/AppShell";
 import MicButton from "@/components/MicButton";
+import SpeakButton from "@/components/SpeakButton";
 import { Button, ErrorText, Input } from "@/components/ui";
 import { api, type ChatMessage } from "@/lib/api";
 import { useLang } from "@/lib/useLang";
@@ -54,16 +55,22 @@ export default function ChatPage() {
         <ul className="flex-1 space-y-3" aria-live="polite">
           {messages.map((m, i) => (
             <li key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-              <p
-                lang={lang}
-                className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2 text-base ${
+              <div
+                className={`max-w-[85%] rounded-2xl px-4 py-2 ${
                   m.role === "user"
                     ? "bg-emerald-700 text-white"
                     : "bg-white text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
                 }`}
               >
-                {m.content}
-              </p>
+                <p lang={lang} className="whitespace-pre-wrap text-base">
+                  {m.content}
+                </p>
+                {m.role === "assistant" ? (
+                  <div className="mt-1 flex justify-end">
+                    <SpeakButton text={m.content} lang={lang} size="sm" />
+                  </div>
+                ) : null}
+              </div>
             </li>
           ))}
           {busy && <li className="text-sm text-zinc-500">{s.thinking}</li>}

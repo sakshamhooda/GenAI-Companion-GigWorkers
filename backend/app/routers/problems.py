@@ -16,7 +16,7 @@ from app import ratelimit
 from app.auth import get_current_user
 from app.context import build_context, system_prompt_for, worker_input
 from app.db import get_session
-from app.llm import extract_json
+from app.llm import aextract_json
 from app.models import Problem, User
 from app.routers.earnings import recent_earnings
 from app.schemas import ProblemIn, ProblemOut, ProblemResult
@@ -157,7 +157,7 @@ async def analyze(
     prompt = (
         f"{build_context(user, earnings)}\n\n{_kb_block()}\n\n{TASK}\n\n{worker_input(body.text)}"
     )
-    raw = extract_json(prompt, system_prompt_for(user), stub=STUB_RESULT)
+    raw = await aextract_json(prompt, system_prompt_for(user), stub=STUB_RESULT)
     result = normalise(raw, user.language)
     row = Problem(
         user_id=user.id,

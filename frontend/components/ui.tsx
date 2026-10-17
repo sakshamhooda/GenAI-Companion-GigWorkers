@@ -1,4 +1,6 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
+"use client";
+
+import { useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 
 /** Surface for grouped content. Colours come from the theme tokens in globals.css. */
 export function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
@@ -40,6 +42,57 @@ export function Select({ className = "", ...props }: SelectHTMLAttributes<HTMLSe
 
 export function Textarea({ className = "", ...props }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return <textarea className={`${fieldClass} min-h-28 py-2 ${className}`} {...props} />;
+}
+
+type PinInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "onChange" | "value" | "type"> & {
+  value: string;
+  onChange: (digits: string) => void;
+  showLabel: string;
+  hideLabel: string;
+};
+
+/** 4-digit PIN field with a show/hide toggle. The value is always digits only. */
+export function PinInput({ value, onChange, showLabel, hideLabel, className = "", ...props }: PinInputProps) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <input
+        {...props}
+        type={visible ? "text" : "password"}
+        inputMode="numeric"
+        pattern="[0-9]{4}"
+        maxLength={4}
+        value={value}
+        onChange={(e) => {
+          const digits = e.target.value.replace(/\D/g, "").slice(0, 4);
+          if (digits !== value) onChange(digits);
+        }}
+        className={`${fieldClass} pr-12 ${className}`}
+      />
+      <button
+        type="button"
+        aria-pressed={visible}
+        aria-label={visible ? hideLabel : showLabel}
+        title={visible ? hideLabel : showLabel}
+        onClick={() => setVisible((v) => !v)}
+        className="absolute inset-y-0 right-0 flex min-h-11 w-11 items-center justify-center rounded-r-xl text-muted hover:text-fg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
+        {visible ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+            <path d="M3 3l18 18" />
+            <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+            <path d="M9.9 5.1A10.4 10.4 0 0 1 12 5c5 0 9 4 10 7a11.6 11.6 0 0 1-3.2 4.4" />
+            <path d="M6.6 6.6A11.5 11.5 0 0 0 2 12c1 3 5 7 10 7a9.8 9.8 0 0 0 4.4-1" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5" aria-hidden="true">
+            <path d="M2 12c1-3 5-7 10-7s9 4 10 7c-1 3-5 7-10 7S3 15 2 12z" />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+        )}
+      </button>
+    </div>
+  );
 }
 
 /** Inline error message announced to screen readers via role="alert". */

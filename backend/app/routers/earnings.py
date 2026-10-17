@@ -11,7 +11,7 @@ from app import ratelimit
 from app.auth import get_current_user
 from app.context import system_prompt_for, worker_input
 from app.db import get_session
-from app.llm import extract_json, generate
+from app.llm import aextract_json, agenerate
 from app.models import Earning, User
 from app.schemas import (
     AnalyticsOut,
@@ -183,7 +183,7 @@ async def analytics(
         + "\n".join(lines)
         + f"\nBest platform: {data['best_platform']}\n{INSIGHT_TASK}"
     )
-    insight = generate(prompt, system_prompt_for(user))
+    insight = await agenerate(prompt, system_prompt_for(user))
     if insight.startswith("[stub]"):
         insight = STUB_INSIGHT
     return AnalyticsOut(**data, insight=insight)
@@ -234,7 +234,7 @@ async def parse_earning(body: ParseIn, user: User = Depends(get_current_user)) -
         "date": today.isoformat(),
         "hours": None,
     }
-    data = extract_json(prompt, PARSE_SYSTEM, stub=stub)
+    data = await aextract_json(prompt, PARSE_SYSTEM, stub=stub)
     try:
         parsed_date = date.fromisoformat(str(data.get("date") or today.isoformat()))
     except ValueError:

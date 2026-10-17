@@ -6,7 +6,7 @@ from app import ratelimit
 from app.auth import get_current_user
 from app.context import build_context, system_prompt_for, worker_input
 from app.db import get_session
-from app.llm import generate
+from app.llm import agenerate
 from app.models import Message, User
 from app.routers.earnings import recent_earnings
 from app.routers.problems import recent_problem_lines
@@ -56,7 +56,7 @@ async def chat(
         f"RECENT CONVERSATION\n{transcript or '(none)'}\n\n"
         f"Worker: {worker_input(body.message)}\nSaathi:"
     )
-    reply = generate(prompt, system_prompt_for(user))
+    reply = await agenerate(prompt, system_prompt_for(user))
     session.add_all(
         [
             Message(user_id=user.id, role="user", content=body.message),

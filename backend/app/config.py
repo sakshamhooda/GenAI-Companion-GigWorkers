@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     google_client_id: str | None = None
     # Without a client id, lets the "demo" credential sign in a seeded Google-style user.
     google_demo_mode: bool = False
+    # Optional demo worker for evaluation. Seeded only when both are set; never hardcoded.
+    demo_phone: str | None = None
+    demo_pin: str | None = None
     trusted_hosts: str = "*"
     rate_limit_enabled: bool = True
 

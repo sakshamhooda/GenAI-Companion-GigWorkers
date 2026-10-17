@@ -21,6 +21,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         headers.setdefault("X-Frame-Options", "DENY")
         headers.setdefault("Referrer-Policy", "no-referrer")
         headers.setdefault("Permissions-Policy", "microphone=(self), camera=(), geolocation=()")
+        headers.setdefault("Cross-Origin-Opener-Policy", "same-origin")
+        headers.setdefault("Cross-Origin-Resource-Policy", "same-site")
+        headers.setdefault("X-Permitted-Cross-Domain-Policies", "none")
         if settings.is_production:
             headers.setdefault("Strict-Transport-Security", "max-age=31536000; includeSubDomains")
         if request.headers.get("authorization") and "cache-control" not in headers:

@@ -9,7 +9,7 @@ import TopBar from "@/components/TopBar";
 import { api, setLang, setToken, type AuthResponse } from "@/lib/api";
 import { t } from "@/lib/i18n";
 import { useLang } from "@/lib/useLang";
-import { Button, Card, ErrorText, Input, Label } from "@/components/ui";
+import { Button, Card, ErrorText, Input, Label, PinInput } from "@/components/ui";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -67,15 +67,14 @@ export default function LoginPage() {
             </div>
             <div>
               <Label htmlFor="pin">{s.pin} / PIN</Label>
-              <Input
+              <PinInput
                 id="pin"
-                type="password"
-                inputMode="numeric"
-                pattern="[0-9]{4}"
-                maxLength={4}
+                autoComplete="one-time-code"
                 required
                 value={pin}
-                onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+                onChange={setPin}
+                showLabel={s.showPin}
+                hideLabel={s.hidePin}
               />
             </div>
             <ErrorText>{error}</ErrorText>
@@ -97,7 +96,6 @@ export default function LoginPage() {
               {s.register}
             </Link>
           </p>
-          <p className="mt-3 text-center text-xs text-muted">Demo: 9999999999 / 1234</p>
         </Card>
       </main>
     </>

@@ -1,16 +1,20 @@
-"""Idempotent demo data so evaluators can log in without registering."""
+"""Idempotent demo data so evaluators can log in without registering.
+
+The demo worker's phone and PIN come from ``DEMO_PHONE`` / ``DEMO_PIN`` in the
+environment. When either is unset nothing is seeded, so no credentials live in
+the codebase.
+"""
 
 from datetime import date, timedelta
 
 from sqlalchemy import select
 
 from app.auth import hash_pin
+from app.config import settings
 from app.db import get_engine, get_sessionmaker
 from app.models import Earning, User
 from app.util import join_csv
 
-DEMO_PHONE = "9999999999"
-DEMO_PIN = "1234"  # not a secret: shown on the landing page for evaluators
 DEMO_PLATFORMS = ["Zomato", "Swiggy"]
 DEMO_WORK_TYPES = ["delivery"]
 
@@ -29,10 +33,11 @@ async def seed_demo() -> None:
 
     Safe to call on every startup. Does nothing when no database is configured.
     """
-    if get_engine() is None:
+    demo_phone, demo_pin = settings.demo_phone, settings.demo_pin
+    if get_engine() is None or not demo_phone or not demo_pin:
         return
     async with get_sessionmaker()() as session:
-        user = await session.scalar(select(User).where(User.phone == DEMO_PHONE))
+        user = await session.scalar(select(User).where(User.phone == demo_phone))
         if user is not None:
             # Keep the demo profile current without touching anything else, and backfill
             # hours on seeded entries created before migration 0004.
@@ -48,8 +53,8 @@ async def seed_demo() -> None:
             await session.commit()
             return
         user = User(
-            phone=DEMO_PHONE,
-            pin_hash=hash_pin(DEMO_PIN),
+            phone=demo_phone,
+            pin_hash=hash_pin(demo_pin),
             name="Ramesh",
             language="hi",
             work_type=join_csv(DEMO_WORK_TYPES),

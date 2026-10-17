@@ -32,5 +32,5 @@ Email hooda.saksham@gmail.com with the subject "Saathi security". Please do not 
 ## Data handling
 
 - Earnings, messages and complaint drafts are stored per user in Postgres on Railway over private networking.
-- The demo account (`9999999999` / `1234`) is public by design and holds only seed data.
+- A demo worker is seeded only when `DEMO_PHONE` and `DEMO_PIN` are set in the environment; no credentials are hardcoded or shown in the UI. The "Continue with Google (demo)" button exists for evaluation and is disabled once a real Google client is configured.
 - Delete-my-data is not yet exposed in the UI; it is a single SQL delete by user id and is on the roadmap as an endpoint.

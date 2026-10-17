@@ -10,7 +10,9 @@ export default function AppShell({ title, children }: { title?: string; children
   return (
     <AuthGuard>
       <TopBar title={title} profileLink />
-      <main className="mx-auto w-full max-w-md flex-1 px-4 pb-24 pt-4">{children}</main>
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-md flex-1 px-4 pb-24 pt-4">
+        {children}
+      </main>
       <BottomNav />
     </AuthGuard>
   );

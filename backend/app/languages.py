@@ -1,7 +1,8 @@
 """Supported worker languages.
 
 Codes follow the Sarvam Saaras speech-to-text list (BCP-47 in `sarvam`).
-`tts` marks languages Bulbul text-to-speech can speak.
+`tts` marks languages Sarvam Bulbul v4-flash text-to-speech can speak (hi, en, bn, gu,
+kn, mr, pa, ta, te). Others fall back to Gemini TTS.
 """
 
 LANGUAGES: dict[str, dict[str, str | bool]] = {
@@ -10,9 +11,9 @@ LANGUAGES: dict[str, dict[str, str | bool]] = {
     "bn": {"name": "Bengali", "native": "বাংলা", "sarvam": "bn-IN", "tts": True},
     "gu": {"name": "Gujarati", "native": "ગુજરાતી", "sarvam": "gu-IN", "tts": True},
     "kn": {"name": "Kannada", "native": "ಕನ್ನಡ", "sarvam": "kn-IN", "tts": True},
-    "ml": {"name": "Malayalam", "native": "മലയാളം", "sarvam": "ml-IN", "tts": True},
+    "ml": {"name": "Malayalam", "native": "മലയാളം", "sarvam": "ml-IN", "tts": False},
     "mr": {"name": "Marathi", "native": "मराठी", "sarvam": "mr-IN", "tts": True},
-    "od": {"name": "Odia", "native": "ଓଡ଼ିଆ", "sarvam": "od-IN", "tts": True},
+    "od": {"name": "Odia", "native": "ଓଡ଼ିଆ", "sarvam": "od-IN", "tts": False},
     "pa": {"name": "Punjabi", "native": "ਪੰਜਾਬੀ", "sarvam": "pa-IN", "tts": True},
     "ta": {"name": "Tamil", "native": "தமிழ்", "sarvam": "ta-IN", "tts": True},
     "te": {"name": "Telugu", "native": "తెలుగు", "sarvam": "te-IN", "tts": True},
